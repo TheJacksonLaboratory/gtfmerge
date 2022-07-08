@@ -1,3 +1,5 @@
+import bisect
+
 ######################################################################################
 ## matching exons and transcripts:
 
@@ -342,19 +344,27 @@ def filter_locs(seq, primary_dat, secondary_dat, args):
         secondary_dat['max_transcript_length']
     )
 
+    ## for bisect search; older python w/o bisect_left 'key' parameter:
+    secondary_starts = [loc[0] for loc in secondary_locs]
+
     ##  [start, end, strand, transcript]:
 
     for primary_loc in primary_locs:
 
         primary_id = primary_loc[3]
         primary_transcript = primary_dat['transcripts'][primary_id]
+        left_pos = primary_loc[0] - max_transcript_length
 
-        for secondary_loc in secondary_locs:
+        if left_pos <= 0:
+            left_pos = 0
+            idx = 0
+        else:
+            ## assumes secondary_locs sorted by start position:
+            idx = bisect.bisect_left(secondary_starts, left_pos)
+            if idx == len(secondary_locs):
+                continue         ## no potential matches; done w/ primary_loc
 
-            ## primary_start - secondary_start; before potential matches:
-            ##   this step can be sped up w/ binary search ala bisect:
-            if (primary_loc[0] - secondary_loc[0]) > max_transcript_length:
-               continue          ## before potential matches, keep looking
+        for secondary_loc in secondary_locs[idx:]:
 
             ## secondary_start - primary_start; after potential matches:
             if (secondary_loc[0] - primary_loc[0]) > max_transcript_length:
