@@ -140,20 +140,20 @@ except Exception as e:
 
 sys.stderr.write("Resolving secondary_gtf:\n")
 
-secondary_dat = resolve.resolve_self(secondary_dat, 2, args)
+secondary_dat2 = resolve.resolve_self(secondary_dat, 2, args)
 
 sys.stderr.write(
     f"  done at {round(time.time() - time_start, 2)} seconds\n"
-    f"  {len(secondary_dat['transcripts'].keys())} transcript_ids\n"
-    f"  {len(secondary_dat['exons'].keys())} exons\n"
-    f"  {len(secondary_dat['locs'].keys())} seqids\n"
-    f"  max_transcript_length: {secondary_dat['max_transcript_length']}\n"
-    f"  number filtered: {len(secondary_dat['filtered'].keys())}\n\n"
+    f"  {len(secondary_dat2['transcripts'].keys())} transcript_ids\n"
+    f"  {len(secondary_dat2['exons'].keys())} exons\n"
+    f"  {len(secondary_dat2['locs'].keys())} seqids\n"
+    f"  max_transcript_length: {secondary_dat2['max_transcript_length']}\n"
+    f"  number filtered: {len(secondary_dat2['filtered'].keys())}\n\n"
 )
 
 try:
     with open('filter_secondary.tsv', 'w') as fh:
-        for filtered_id, kept_id in secondary_dat['filtered'].items():
+        for filtered_id, kept_id in secondary_dat2['filtered'].items():
             fh.write(f"{filtered_id}\t{kept_id}\n")
 except Exception as e:
     sys.stderr.write(f"ERROR: writing filter_secondary.tsv: {e}\n")
@@ -161,12 +161,12 @@ except Exception as e:
 
 
 ################################################
-## resolve secondary against primary:
+## resolve resolved secondary against resolved primary:
 
 sys.stderr.write("Resolving secondary_gtf against primary_gtf:\n")
 
 try:
-    output_dat = resolve.resolve_transcripts(primary_dat, secondary_dat, args)
+    output_dat = resolve.resolve_transcripts(primary_dat, secondary_dat2, args)
 except Exception as e:
     sys.stderr.write(f"ERROR: while resolving:\n" f"{e}\n")
     sys.exit(43)
@@ -196,16 +196,17 @@ sys.stderr.write(f"Generating final map and gtf outputs.\n")
 
 mappings = output.filter_map(
     primary_dat['filtered'],
-    secondary_dat['filtered'],
+    secondary_dat2['filtered'],
     output_dat['filtered']
 )
 
 rmappings = output.reverse_map(
     mappings, 
     primary_dat['transcripts'], 
-    secondary_dat['transcripts']
+    secondary_dat2['transcripts']
 )
 
+## need to use original unresolved secondary_dat here:
 output_dat = output.output_list(
     output_dat,
     rmappings,

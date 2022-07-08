@@ -239,7 +239,6 @@ def primary_list(dat):
     return output
 
 
-
 def output_list(dat, rev_map, secondary_transcripts, ids_from):
 
     """
