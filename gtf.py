@@ -1,3 +1,14 @@
+"""
+assumes input gtf has both transcript and exon features and that both feature
+  types have transcript_id, plus transcript features have gene_id;
+
+this works w/ gencode and some refseq, but breaks on other refseq which do
+  not have transcript features annotated; for those, would have to change
+  the code in this module to only assume exon features w/ both transcript_id
+  and gene_id; would then build transcript features from exon features; so
+  necessary changes can be limited to this module.
+"""
+
 def parse_attributes(tok9, prefix=None):
 
     """
