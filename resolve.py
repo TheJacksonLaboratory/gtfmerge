@@ -434,6 +434,11 @@ def resolve_transcripts(primary_dat, secondary_dat, args):
         ## keep only non-redundant entries from secondary_dat:
         update_entries(seq, filtered, 2, secondary_dat, output_dat)
 
+    ## supplement w/ seqs unique to secondary_dat:
+    for seq in secondary_dat['locs']:
+        if seq in primary_dat['locs']:
+            continue
+        update_entries(seq, [], 2, secondary_dat, output_dat)
 
     ## sort locs by start then end:
     for seq in output_dat['locs']:
