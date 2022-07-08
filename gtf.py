@@ -18,8 +18,11 @@ def parse_attributes(tok9, prefix=None):
     if prefix is None:
         prefix = ""
 
+    if len(toks) < 4:
+        raise Exception(f"Insufficient number of attribute tokens: {toks}")
+
     if len(toks) % 2:
-        raise Exception(f"Odd number of attribute tokens: {toks}")
+        toks.pop()
 
     n = int(len(toks) / 2)
     attributes = { 'gene_id': None, 'transcript_id': None }
