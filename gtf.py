@@ -13,31 +13,6 @@ this works w/ gencode and some refseq, but breaks on other refseq which do
 ######################################################################
 ## inferring features:
 
-def sort_exons(transcripts):
-    """
-    Inputs:
-      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] }
-
-    Outputs: None
-
-    Side effects: sorts transcripts[*][5] (exons) by (start, end)
-    """
-
-    ## ensure exon_keys of transcript record stay sorted by (start, end),
-    ##   so output order will be correct:
-
-    def f_sort(exon_key):
-        exon = exons[exon_key]
-        start = exon[2]
-        end = exon[3]
-        return (start, end)
-
-    for transcript_id in transcripts:
-        transcripts[transcript_id][5].sort(key=f_sort)
-
-    return
-
-
 def fix_transcripts(exons, transcripts):
 
     """
@@ -75,6 +50,8 @@ def infer_locs(transcripts):
 
     Outputs:
       locs: { seq: [ [start, end, strand, transcript_id], ...], ..., }
+
+      Note: locs[seq] are sorted by (start, end)
     """
 
     locs = {}
