@@ -163,6 +163,55 @@ def register_exon(toks, exons, transcripts, prefix):
     transcripts[attributes['transcript_id']][5].sort(key=f_sort)
 
 
+def get_max_loc_length(loc):
+    """
+    """
+
+    max_loc_length = 0
+    return max_loc_length
+
+
+def infer_transcripts(exons, prefix):
+
+    """
+    Inputs:
+      exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+
+    Output:
+      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] }
+
+      locs: { seq: [ [start, end, strand, transcript], ...], ..., }
+      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] }
+      exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+      max_loc_length: length of longest encountered transcript
+
+    """
+
+    transcripts = {}
+    return transcripts
+
+
+def infer_locs(transcripts):
+    """
+    Inputs:
+      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] }
+
+    Outputs:
+      locs: { seq: [ [start, end, strand, transcript], ...], ..., }
+    """
+
+    locs = {}
+    return locs
+
+
+def parse_exons(fh, prefix):
+    """
+    """
+
+    exons = {}
+    return exons
+
+
 def parse_gtf(fh, prefix):
 
     """
@@ -185,7 +234,7 @@ def parse_gtf(fh, prefix):
     exons = {}
     transcripts = {}
     locs = {}
-    max_transcript_length = 0
+    max_loc_length = 0
 
     for line in fh:
 
@@ -217,14 +266,12 @@ def parse_gtf(fh, prefix):
         except Exception as e:
             raise Exception(f"parse_primary_gtf: int() on '{toks[4]}': {e}")
 
-        if toks[2] == 'transcript':
-            transcript_length = register_transcript(toks, transcripts, locs, prefix)
-            if transcript_length > max_transcript_length:
-                max_transcript_length = transcript_length
-        elif toks[2] == 'exon':
+        if toks[2] == 'exon':
             register_exon(toks, exons, transcripts, prefix)
         else:
             continue
+
+    max_loc_length = infer_transcripts(exons, transcripts, locs, prefix)
 
     ## sort locs by start then end:
     for seq in locs:
@@ -234,7 +281,7 @@ def parse_gtf(fh, prefix):
         'locs': locs,
         'transcripts': transcripts,
         'exons': exons,
-        'max_transcript_length': max_transcript_length
+        'max_loc_length': max_loc_length
     }
 
     return dat

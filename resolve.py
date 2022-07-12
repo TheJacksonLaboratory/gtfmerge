@@ -133,10 +133,10 @@ def update_entries(seq, filtered, source, dat1, dat2):
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
 
       dat2: dict w/ keys like dat1:
-        locs, transcripts, exons, and max_transcript_length; 
+        locs, transcripts, exons, and max_loc_length; 
         also, filtered transcript_ids in filtered dict: { filtered_id: kept_id, ... }
         and sources of kept transcript_ids in sources: { kept_id: source, ... }
           where source is 1 for primary_gtf, 2 for secondary_gtf;
@@ -182,8 +182,8 @@ def update_entries(seq, filtered, source, dat1, dat2):
         ## start - end:
         length = 1 + loc[1] - loc[0]
 
-        if length > dat2['max_transcript_length']:
-            dat2['max_transcript_length'] = length
+        if length > dat2['max_loc_length']:
+            dat2['max_loc_length'] = length
 
     ## ensure locs stay sorted:
     dat2['locs'][seq].sort(key=lambda item: (item[0], item[1]))
@@ -208,7 +208,7 @@ def filter_after(idx, loc_list, dat, args):
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
 
       args is dict w/ keys including:
         tol_sj: tolerance for splice junction matching;
@@ -230,8 +230,8 @@ def filter_after(idx, loc_list, dat, args):
 
         loc_i = loc_list[i]
 
-        ## if (start_i - end) > max_transcript_length:
-        if (loc_i[0] - loc[1]) > dat['max_transcript_length']:
+        ## if (start_i - end) > max_loc_length:
+        if (loc_i[0] - loc[1]) > dat['max_loc_length']:
             break                ## no more overlaps downstream
 
         transcript_id_i = loc_i[3]
@@ -255,7 +255,7 @@ def resolve_self(dat, source, args):
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
 
       source: 1 if dat from primary_gtf, 2 if from secondary_gtf;
 
@@ -265,7 +265,7 @@ def resolve_self(dat, source, args):
         tol_tts: tolerance for termination-site matching;
 
     Returns dict w/ info on non-redundant transcripts in keys:
-      locs, transcripts, exons, and max_transcript_length; 
+      locs, transcripts, exons, and max_loc_length; 
       also, filtered: { filtered_id: kept_id, ... }
       and sources: { kept_id: source, ... }
         where source is 1 for primary_gtf, 2 for secondary_gtf;
@@ -276,7 +276,7 @@ def resolve_self(dat, source, args):
         'locs': {},
         'transcripts': {},
         'exons': {},
-        'max_transcript_length': 0,
+        'max_loc_length': 0,
         'filtered': {},
         'sources': {}
     }
@@ -312,10 +312,10 @@ def filter_locs(seq, primary_dat, secondary_dat, args):
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
 
       secondary_dat is a dict w/ keys like primary_dat:
-        locs, transcripts, exons, max_transcript_length.
+        locs, transcripts, exons, max_loc_length.
 
       args is dict w/ keys including:
         tol_sj: tolerance for splice junction matching;
@@ -339,9 +339,9 @@ def filter_locs(seq, primary_dat, secondary_dat, args):
     if secondary_locs is None:
         return filtered
 
-    max_transcript_length = max(
-        primary_dat['max_transcript_length'], 
-        secondary_dat['max_transcript_length']
+    max_loc_length = max(
+        primary_dat['max_loc_length'], 
+        secondary_dat['max_loc_length']
     )
 
     ## for bisect search; older python w/o bisect_left 'key' parameter:
@@ -353,7 +353,7 @@ def filter_locs(seq, primary_dat, secondary_dat, args):
 
         primary_id = primary_loc[3]
         primary_transcript = primary_dat['transcripts'][primary_id]
-        left_pos = primary_loc[0] - max_transcript_length
+        left_pos = primary_loc[0] - max_loc_length
 
         if left_pos <= 0:
             left_pos = 0
@@ -367,7 +367,7 @@ def filter_locs(seq, primary_dat, secondary_dat, args):
         for secondary_loc in secondary_locs[idx:]:
 
             ## secondary_start - primary_start; after potential matches:
-            if (secondary_loc[0] - primary_loc[0]) > max_transcript_length:
+            if (secondary_loc[0] - primary_loc[0]) > max_loc_length:
                break             ## after potential matches; done w/ primary_loc
 
             secondary_id = secondary_loc[3]
@@ -394,10 +394,10 @@ def resolve_transcripts(primary_dat, secondary_dat, args):
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
 
       secondary_dat is a dict w/ keys like primary_dat: 
-        locs, transcripts, exons, max_transcript_length.
+        locs, transcripts, exons, max_loc_length.
 
       args is dict w/ keys including:
         tol_sj: tolerance for splice junction matching;
@@ -406,7 +406,7 @@ def resolve_transcripts(primary_dat, secondary_dat, args):
 
     Output: returns dict w/ info on non-redundant transcripts
       in secondary dat w/ keys like primary_dat: 
-        locs, transcripts, exons, max_transcript_length
+        locs, transcripts, exons, max_loc_length
       but also filtered w/ info on filtered transcripts:
         { filtered_id: kept_id, ... }
       and sources w/ info on source of kept transcripts:
@@ -417,7 +417,7 @@ def resolve_transcripts(primary_dat, secondary_dat, args):
         'locs': {},
         'transcripts': {},
         'exons': {},
-        'max_transcript_length': 0,
+        'max_loc_length': 0,
         'filtered': {},
         'sources': {}
     }

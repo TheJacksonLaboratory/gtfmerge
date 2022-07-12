@@ -56,7 +56,7 @@ sys.stderr.write(
     f"  {len(primary_dat['transcripts'].keys())} transcript_ids\n"
     f"  {len(primary_dat['exons'].keys())} exons\n"
     f"  {len(primary_dat['locs'].keys())} seqids\n"
-    f"  max_transcript_length: {primary_dat['max_transcript_length']}\n\n"
+    f"  max_loc_length: {primary_dat['max_loc_length']}\n\n"
 )
 
 
@@ -71,7 +71,7 @@ if not args.keep_all_primary:
         f"  {len(primary_dat['transcripts'].keys())} transcript_ids\n"
         f"  {len(primary_dat['exons'].keys())} exons\n"
         f"  {len(primary_dat['locs'].keys())} seqids\n"
-        f"  max_transcript_length: {primary_dat['max_transcript_length']}\n"
+        f"  max_loc_length: {primary_dat['max_loc_length']}\n"
         f"  number filtered: {len(primary_dat['filtered'].keys())}\n\n"
     )
 
@@ -124,7 +124,7 @@ try:
         f"  {len(secondary_dat['transcripts'].keys())} transcript_ids\n"
         f"  {len(secondary_dat['exons'].keys())} exons\n"
         f"  {len(secondary_dat['locs'].keys())} seqids\n"
-        f"  max_transcript_length: {secondary_dat['max_transcript_length']}\n\n"
+        f"  max_loc_length: {secondary_dat['max_loc_length']}\n\n"
     )
 
 except Exception as e:
@@ -147,7 +147,7 @@ sys.stderr.write(
     f"  {len(secondary_dat2['transcripts'].keys())} transcript_ids\n"
     f"  {len(secondary_dat2['exons'].keys())} exons\n"
     f"  {len(secondary_dat2['locs'].keys())} seqids\n"
-    f"  max_transcript_length: {secondary_dat2['max_transcript_length']}\n"
+    f"  max_loc_length: {secondary_dat2['max_loc_length']}\n"
     f"  number filtered: {len(secondary_dat2['filtered'].keys())}\n\n"
 )
 
@@ -176,7 +176,7 @@ sys.stderr.write(
     f"  {len(output_dat['transcripts'].keys())} transcript_ids\n"
     f"  {len(output_dat['exons'].keys())} exons\n"
     f"  {len(output_dat['locs'].keys())} seqids\n"
-    f"  max_transcript_length: {output_dat['max_transcript_length']}\n"
+    f"  max_loc_length: {output_dat['max_loc_length']}\n"
     f"  number filtered: {len(output_dat['filtered'].keys())}\n\n"
 )
 
