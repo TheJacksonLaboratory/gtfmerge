@@ -1,12 +1,20 @@
 """
-assumes input gtf has both transcript and exon features and that both feature
-  types have transcript_id, plus transcript features have gene_id;
+parses gtf file; assumes input gtf has exon features that have 
+  attributes transcript_id, and gene_id; 
 
-this works w/ gencode and some refseq, but breaks on other refseq which do
-  not have transcript features annotated; for those, would have to change
-  the code in this module to only assume exon features w/ both transcript_id
-  and gene_id; would then build transcript features from exon features; so
-  necessary changes can be limited to this module.
+main entrypoint is parse_gtf();
+
+  takes filehandle and prefix to be prepended to gene_id and
+    transcript_id.
+
+  returns:
+    locs: { seq: [ [start, end, strand, transcript], ...], ..., }
+      locs[seq] sorted ascending by (start, end)
+    transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exon_keys] }
+      where exon_keys: 'seq:strand:start:end'), and [exon_keys] sorted 
+      ascending by (start, end)
+    exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+    max_loc_length: length of longest encountered loc
 """
 
 
@@ -20,7 +28,7 @@ def fix_transcripts(exons, transcripts):
 
       exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
 
-      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] }
+      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exon_keys] }
 
     Output: None
 
@@ -46,7 +54,7 @@ def infer_locs(transcripts):
 
     """
     Inputs:
-      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] }
+      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exon_keys] }
 
     Outputs:
       locs: { seq: [ [start, end, strand, transcript_id], ...], ..., }
@@ -109,7 +117,7 @@ def register_exon(toks, exons, transcripts, attributes):
 
       exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
 
-      transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exons] }
+      transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exon_keys] }
 
       attributes: dict w/ keys 'gene_id' and 'transcript_id'; values set to None if missing
 
@@ -284,7 +292,7 @@ def parse_gtf(fh, prefix):
     Outputs: dict w/ keys:
       locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         locs[seq] sorted ascending by (start, end)
-      transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exons] }
+      transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exon_keys] }
         transcripts[transcript_id][5] (exons) sorted ascending by (start, end)
       exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
       max_loc_length: length of longest encountered loc 
