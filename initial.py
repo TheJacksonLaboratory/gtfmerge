@@ -9,22 +9,28 @@ import sys
 import time
 
 description = (
+    "Merges redundant transcripts from GTF2.2 formatted files. "
     "Merges primary_gtf with secondary_gtf, resulting in a non-redundant union gtf. "
     "Omitting secondary_gtf results in non-redundant set from primary_gtf."
 )
 
 epilog = (
-    "Requires GTFs to have exon features with attributes that "
-    "include 'gene_id' and 'transcript_id'; "
-    "output includes 'exon' and 'transcript' features, "
-    "both with attributes (in order) "
-    "'gene_id', 'transcript_id', 'primary_id', 'secondary_id; "
-    "primary_id is the transcript_id in primary_gtf, and "
-    "secondary_id is the transcript_id in secondary_gtf; "
-    "set to empty string '' if not present in corresponding gtf. "
-    "Error if transcript_id in primary_gtf is also "
-    "found in secondary_gtf; set --primary_prefix and/or "
-    "--secondary_prefix to fix this."
+    "Input GTF2.2 formatted files are required to have exon "
+    "features with attributes that include 'gene_id' and "
+    "'transcript_id'. Output GTF2.2 formatted file includes "
+    "'exon' and 'transcript' features, both with attributes "
+    "(in order) 'gene_id', 'transcript_id', 'primary_id', "
+    "'secondary_id; where primary_id is the transcript_id "
+    "in primary_gtf, and secondary_id is the transcript_id "
+    "in secondary_gtf; primary_id and/or secondary_id will be "
+    "set to empty string '' if the transcript is not present "
+    "in the corresponding GTF file. Error if transcript_id in "
+    "primary_gtf is also found in secondary_gtf; set "
+    "--primary_prefix and/or --secondary_prefix to fix this. "
+    "When a transcript is found in both input files, but the "
+    "exon boundaries differ (within the specified tolerances), "
+    "the output exon coordinates will be taken from "
+    "primary_gtf."
 )
 
 parser = argparse.ArgumentParser(
@@ -55,7 +61,7 @@ parser.add_argument(
     "--tol_tss", 
     type=int, 
     default=0,
-    help="Tolerance (bp) for matching transcriptional start coordinates"
+    help="Tolerance (bp) for matching transcript start coordinates"
 )
 
 parser.add_argument(
@@ -70,7 +76,10 @@ parser.add_argument(
     type=int, 
     choices=[1, 2], 
     default=1,
-    help="Source for transcript_ids and gene_ids; 1: primary_gtf; 2: secondary_gtf"
+    help=(
+        "Source of transcript_ids and gene_ids for redundant transcripts; "
+        "1: primary_gtf; 2: secondary_gtf"
+    )
 )
 
 parser.add_argument(
@@ -83,14 +92,14 @@ parser.add_argument(
     "--primary_prefix",
     type=str,
     default=None,
-    help="Prefix for primary_gtf transcript_ids"
+    help="Prefix to be prepended to primary_gtf transcript_ids"
 )
 
 parser.add_argument(
    "--secondary_prefix",
    type=str,
    default=None,
-   help="Prefix for secondary_gtf transcript_ids"
+   help="Prefix to be prepended to secondary_gtf transcript_ids"
 )
 
 def initialize():
