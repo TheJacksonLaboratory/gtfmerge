@@ -22,8 +22,9 @@ optional arguments:
                         coordinates (default: 0)
   --tol_tts TOL_TTS     Tolerance (bp) for matching transcript end coordinates
                         (default: 0)
-  --ids_from {1,2}      Source for transcript_ids and gene_ids; 1:
-                        primary_gtf; 2: secondary_gtf (default: 1)
+  --ids_from {1,2}      Source of transcript_ids and gene_ids for redundant
+                        transcripts; 1: primary_gtf; 2: secondary_gtf
+                        (default: 1)
   --keep_all_primary    Keep all primary transcripts (even redundant ones)
                         (default: False)
   --primary_prefix PRIMARY_PREFIX
@@ -46,4 +47,3 @@ is found in both input files, but the exon boundaries differ (within the
 specified tolerances), the output exon coordinates will be taken from
 primary_gtf.
 ```
-
