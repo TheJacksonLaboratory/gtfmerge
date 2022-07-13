@@ -32,7 +32,7 @@ def fix_transcripts(exons, transcripts):
 
     Output: None
 
-    Side effects: for each transcripts[transcript_id]: sorts exons and fill start, end
+    Side effects: for each transcripts[transcript_id]: sorts exons and fills start, end
     """
 
     def f_sort(exon_key):
@@ -116,14 +116,16 @@ def register_exon(toks, exons, transcripts, attributes):
         expects attributes to contain transcript_id and gene_id
 
       exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+        updated by this function;
 
       transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exon_keys] }
+        updated by this function;
 
       attributes: dict w/ keys 'gene_id' and 'transcript_id'; values set to None if missing
 
     Output: None
 
-    Side effect: updates exons
+    Side effect: updates exons and transcripts
     """
 
     if attributes['transcript_id'] is None:
@@ -202,7 +204,6 @@ def parse_exon_line(line):
               0      1       2     3   4     5      6     7           8          9
         seqname source feature start end score strand frame [attributes] [comments]
     """
-
 
     toks = line.split('\t')
     toks = [ tok_i.strip() for tok_i in toks ]

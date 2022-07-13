@@ -1,3 +1,7 @@
+"""
+Contains initialization and argument handling code. 
+"""
+
 import argparse
 import os
 import socket
@@ -10,8 +14,10 @@ description = (
 )
 
 epilog = (
-    "Output includes 'exon' and 'transcript' features, "
-    "with attributes (in order) "
+    "Requires GTFs to have exon features with attributes that "
+    "include 'gene_id' and 'transcript_id'; "
+    "output includes 'exon' and 'transcript' features, "
+    "both with attributes (in order) "
     "'gene_id', 'transcript_id', 'primary_id', 'secondary_id; "
     "primary_id is the transcript_id in primary_gtf, and "
     "secondary_id is the transcript_id in secondary_gtf; "
@@ -64,7 +70,7 @@ parser.add_argument(
     type=int, 
     choices=[1, 2], 
     default=1,
-    help="Where to get transcript_ids and gene_ids; 1: primary_gtf; 2: secondary_gtf"
+    help="Source for transcript_ids and gene_ids; 1: primary_gtf; 2: secondary_gtf"
 )
 
 parser.add_argument(

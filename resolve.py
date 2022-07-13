@@ -1,3 +1,7 @@
+"""
+Code for identifying overlaps between transcripts and exons.
+"""
+
 import bisect
 
 ######################################################################################
@@ -16,7 +20,7 @@ def exons_match(exon1, exon2, tol_start, tol_end):
 
     Output: returns True if match within tolerances; otherwise returns False.
 
-    NOTE: keep in mind start and end are relative to sequence start on positive strand;
+    NOTE: start and end are relative to sequence start on positive strand;
       so need to flip tolerances for negative strand matching of terminal exons.
     '''
 
@@ -344,7 +348,7 @@ def filter_locs(seq, primary_dat, secondary_dat, args):
         secondary_dat['max_loc_length']
     )
 
-    ## for bisect search; older python w/o bisect_left 'key' parameter:
+    ## for bisect search; accommodates older python w/o bisect_left 'key' parameter:
     secondary_starts = [loc[0] for loc in secondary_locs]
 
     ##  [start, end, strand, transcript]:

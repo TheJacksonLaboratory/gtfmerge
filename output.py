@@ -1,3 +1,7 @@
+"""
+Code for generating and printing outputs;
+"""
+
 import copy
 
 def filter_map(primary_filter, secondary_filter, output_filter):
