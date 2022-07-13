@@ -1,4 +1,4 @@
-'''
+```
 usage: gtfmerge.py [-h] [--tol_sj TOL_SJ] [--tol_tss TOL_TSS]
                    [--tol_tts TOL_TTS] [--ids_from {1,2}] [--keep_all_primary]
                    [--primary_prefix PRIMARY_PREFIX]
@@ -45,4 +45,5 @@ set --primary_prefix and/or --secondary_prefix to fix this. When a transcript
 is found in both input files, but the exon boundaries differ (within the
 specified tolerances), the output exon coordinates will be taken from
 primary_gtf.
-'''
+```
+
