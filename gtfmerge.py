@@ -18,6 +18,7 @@ Description: Merges primary_gtf with secondary_gtf, resulting in a
 For usage: python3 gtfmerge.py -h
 
 Internals: 
+  0) gtfs must have exon features w/ annotation including gene_id and transcript_id
   1) get rid of duplicates in primary_gtf; record { filtered_id: kept_id, ... }
   2) get rid of duplicates in secondary_gtf; record { filtered_id: kept_id, ...}
   3) add all unique from primary_gtf to output
@@ -26,7 +27,7 @@ Internals:
   6) make table of cross-references/mappings and print to file
   7) print to file output gtf, assigning gene_id/transcript_id per id_from argument
 
-  proper output order assumes locs and transcript['exons'] (exon_keys) 
+  proper output order assumes locs and transcripts[transcript_id][5] [exon_keys] 
     stay sorted by (start, end);
 
 Author: mitch.kostich@jax.org
@@ -56,7 +57,7 @@ sys.stderr.write(
     f"  {len(primary_dat['transcripts'].keys())} transcript_ids\n"
     f"  {len(primary_dat['exons'].keys())} exons\n"
     f"  {len(primary_dat['locs'].keys())} seqids\n"
-    f"  max_transcript_length: {primary_dat['max_transcript_length']}\n\n"
+    f"  max_loc_length: {primary_dat['max_loc_length']}\n\n"
 )
 
 
@@ -71,7 +72,7 @@ if not args.keep_all_primary:
         f"  {len(primary_dat['transcripts'].keys())} transcript_ids\n"
         f"  {len(primary_dat['exons'].keys())} exons\n"
         f"  {len(primary_dat['locs'].keys())} seqids\n"
-        f"  max_transcript_length: {primary_dat['max_transcript_length']}\n"
+        f"  max_loc_length: {primary_dat['max_loc_length']}\n"
         f"  number filtered: {len(primary_dat['filtered'].keys())}\n\n"
     )
 
@@ -124,7 +125,7 @@ try:
         f"  {len(secondary_dat['transcripts'].keys())} transcript_ids\n"
         f"  {len(secondary_dat['exons'].keys())} exons\n"
         f"  {len(secondary_dat['locs'].keys())} seqids\n"
-        f"  max_transcript_length: {secondary_dat['max_transcript_length']}\n\n"
+        f"  max_loc_length: {secondary_dat['max_loc_length']}\n\n"
     )
 
 except Exception as e:
@@ -147,7 +148,7 @@ sys.stderr.write(
     f"  {len(secondary_dat2['transcripts'].keys())} transcript_ids\n"
     f"  {len(secondary_dat2['exons'].keys())} exons\n"
     f"  {len(secondary_dat2['locs'].keys())} seqids\n"
-    f"  max_transcript_length: {secondary_dat2['max_transcript_length']}\n"
+    f"  max_loc_length: {secondary_dat2['max_loc_length']}\n"
     f"  number filtered: {len(secondary_dat2['filtered'].keys())}\n\n"
 )
 
@@ -176,7 +177,7 @@ sys.stderr.write(
     f"  {len(output_dat['transcripts'].keys())} transcript_ids\n"
     f"  {len(output_dat['exons'].keys())} exons\n"
     f"  {len(output_dat['locs'].keys())} seqids\n"
-    f"  max_transcript_length: {output_dat['max_transcript_length']}\n"
+    f"  max_loc_length: {output_dat['max_loc_length']}\n"
     f"  number filtered: {len(output_dat['filtered'].keys())}\n\n"
 )
 

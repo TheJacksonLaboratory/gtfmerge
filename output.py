@@ -1,3 +1,7 @@
+"""
+Code for generating and printing outputs;
+"""
+
 import copy
 
 def filter_map(primary_filter, secondary_filter, output_filter):
@@ -119,7 +123,7 @@ def make_attributes(output_id, output_dat, secondary_transcripts=None, rev_map=N
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ], ... }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
         sources: { kept_id: source, ... }; where source is 1 for primary_gtf, else 2;
 
       secondary_transcripts: input data from secondary_gtf; dict:
@@ -178,7 +182,7 @@ def primary_list(dat):
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
         sources: { kept_id: source, ... }; where source is 1 for primary_gtf, else 2;
 
     Output: list w/ format:
@@ -248,7 +252,7 @@ def output_list(dat, rev_map, secondary_transcripts, ids_from):
         locs: { seq: [ [start, end, strand, transcript], ...], ..., }
         transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
-        max_transcript_length: length of longest transcript
+        max_loc_length: length of longest transcript
         sources: { kept_id: source, ... }; where source is 1 for primary_gtf, else 2;
 
       rev_map: mappings from kept transcripts to list of filtered
