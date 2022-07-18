@@ -40,7 +40,7 @@ time_start = initial.initialize()
 ################################################
 ## parse primary_gtf:
 
-sys.stderr.write("\n" f"Reading primary_gtf '{args.primary_gtf}':\n")
+print("\n" f"Reading primary_gtf '{args.primary_gtf}':")
 
 try:
     with open(args.primary_gtf, 'r') as fh:
@@ -52,12 +52,12 @@ except Exception as e:
     )
     sys.exit(31)
 
-sys.stderr.write(
+print(
     f"  done at {round(time.time() - time_start, 2)} seconds\n"
     f"  {len(primary_dat['transcripts'].keys())} transcript_ids\n"
     f"  {len(primary_dat['exons'].keys())} exons\n"
     f"  {len(primary_dat['locs'].keys())} seqids\n"
-    f"  max_loc_length: {primary_dat['max_loc_length']}\n\n"
+    f"  max_loc_length: {primary_dat['max_loc_length']}\n"
 )
 
 
@@ -65,15 +65,15 @@ sys.stderr.write(
 ## resolve primary_gtf against itself:
 
 if not args.keep_all_primary:
-    sys.stderr.write("Resolving primary_gtf:\n")
+    print("Resolving primary_gtf:")
     primary_dat = resolve.resolve_self(primary_dat, 1, args)
-    sys.stderr.write(
+    print(
         f"  done at {round(time.time() - time_start, 2)} seconds\n"
         f"  {len(primary_dat['transcripts'].keys())} transcript_ids\n"
         f"  {len(primary_dat['exons'].keys())} exons\n"
         f"  {len(primary_dat['locs'].keys())} seqids\n"
         f"  max_loc_length: {primary_dat['max_loc_length']}\n"
-        f"  number filtered: {len(primary_dat['filtered'].keys())}\n\n"
+        f"  number filtered: {len(primary_dat['filtered'].keys())}\n"
     )
 
 
@@ -81,14 +81,14 @@ if not args.keep_all_primary:
 ## if no secondary_gtf:
 
 if not args.secondary_gtf:
-    sys.stderr.write("No secondary_gtf.\n")
+    print("No secondary_gtf.")
 
-    sys.stderr.write(f"Generating final gtf output.\n")
+    print(f"Generating final gtf output.")
     primary_list = output.primary_list(primary_dat)
-    sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")
+    print(f"  done at {round(time.time() - time_start, 2)} seconds\n")
 
     output_gtf = args.output_prefix + '.gtf'
-    sys.stderr.write(f"Writing output_gtf {output_gtf}:\n")
+    print(f"Writing output_gtf {output_gtf}:")
 
     try:
         with open(output_gtf, 'w') as fh:
@@ -100,25 +100,25 @@ if not args.secondary_gtf:
         sys.stderr.write(f"ERROR: while writing output_gtf {output_gtf}:\n" f"{e}\n")
         sys.exit(35)
 
-    sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")
+    print(f"  done at {round(time.time() - time_start, 2)} seconds\n")
     sys.exit(0)
 
 
 ################################################
 ## parse secondary_gtf:
 
-sys.stderr.write("Parsing secondary_gtf:\n")
+print("Parsing secondary_gtf:")
 
 try:
     with open(args.secondary_gtf, 'r') as fh:
         secondary_dat = gtf.parse_gtf(fh, args.secondary_prefix)
 
-    sys.stderr.write(
+    print(
         f"  done at {round(time.time() - time_start, 2)} seconds\n"
         f"  {len(secondary_dat['transcripts'].keys())} transcript_ids\n"
         f"  {len(secondary_dat['exons'].keys())} exons\n"
         f"  {len(secondary_dat['locs'].keys())} seqids\n"
-        f"  max_loc_length: {secondary_dat['max_loc_length']}\n\n"
+        f"  max_loc_length: {secondary_dat['max_loc_length']}\n"
     )
 
 except Exception as e:
@@ -132,24 +132,24 @@ except Exception as e:
 ################################################
 ## resolve secondary_gtf against itself:
 
-sys.stderr.write("Resolving secondary_gtf:\n")
+print("Resolving secondary_gtf:")
 
 secondary_dat2 = resolve.resolve_self(secondary_dat, 2, args)
 
-sys.stderr.write(
+print(
     f"  done at {round(time.time() - time_start, 2)} seconds\n"
     f"  {len(secondary_dat2['transcripts'].keys())} transcript_ids\n"
     f"  {len(secondary_dat2['exons'].keys())} exons\n"
     f"  {len(secondary_dat2['locs'].keys())} seqids\n"
     f"  max_loc_length: {secondary_dat2['max_loc_length']}\n"
-    f"  number filtered: {len(secondary_dat2['filtered'].keys())}\n\n"
+    f"  number filtered: {len(secondary_dat2['filtered'].keys())}\n"
 )
 
 
 ################################################
 ## resolve resolved secondary against resolved primary:
 
-sys.stderr.write("Resolving secondary_gtf against primary_gtf:\n")
+print("Resolving secondary_gtf against primary_gtf:")
 
 try:
     output_dat = resolve.resolve_transcripts(primary_dat, secondary_dat2, args)
@@ -157,20 +157,20 @@ except Exception as e:
     sys.stderr.write(f"ERROR: while resolving:\n" f"{e}\n")
     sys.exit(43)
 
-sys.stderr.write(
+print(
     f"  done at {round(time.time() - time_start, 2)} seconds\n"
     f"  {len(output_dat['transcripts'].keys())} transcript_ids\n"
     f"  {len(output_dat['exons'].keys())} exons\n"
     f"  {len(output_dat['locs'].keys())} seqids\n"
     f"  max_loc_length: {output_dat['max_loc_length']}\n"
-    f"  number filtered: {len(output_dat['filtered'].keys())}\n\n"
+    f"  number filtered: {len(output_dat['filtered'].keys())}\n"
 )
 
 
 #################################################################
 ## output:
 
-sys.stderr.write(f"Generating final map and gtf outputs.\n")
+print(f"Generating final map and gtf outputs.")
 
 mappings = output.filter_map(
     primary_dat['filtered'],
@@ -191,10 +191,10 @@ output_dat = output.output_list(
     secondary_dat['transcripts'],
     args.ids_from
 )
-sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")
+print(f"  done at {round(time.time() - time_start, 2)} seconds\n")
 
 output_tsv = args.output_prefix + ".filter.tsv"
-sys.stderr.write(f"Writing output_tsv {output_tsv}:\n")
+print(f"Writing output_tsv {output_tsv}:")
 
 try:
     with open(output_tsv, 'w') as fh:
@@ -210,7 +210,7 @@ except Exception as e:
     sys.exit(51)
 
 output_gtf = args.output_prefix + ".gtf"
-sys.stderr.write(f"Writing output_gtf {output_gtf}:\n")
+print(f"Writing output_gtf {output_gtf}:")
 
 try:
     with open(output_gtf, 'w') as fh:
@@ -222,6 +222,6 @@ except Exception as e:
     sys.stderr.write(f"ERROR: while writing output_gtf {output_gtf}:\n" f"{e}\n")
     sys.exit(53)
 
-sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")
+print(f"  done at {round(time.time() - time_start, 2)} seconds\n")
 sys.exit(0)
 

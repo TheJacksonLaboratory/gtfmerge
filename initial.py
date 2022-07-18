@@ -121,10 +121,10 @@ def initialize():
         time.localtime(time_start)
     )
 
-    sys.stderr.write(
+    print(
         f"time_stamp: {time_stamp}\n"
         f"hostname: {socket.gethostname()}\n"
-        f"working_directory: {os.getcwd()}\n"
+        f"working_directory: {os.getcwd()}"
     )
 
     return time_start
@@ -148,7 +148,7 @@ def parse_args():
     ]
 
     for arg_name in arg_names:
-        sys.stderr.write(f"{arg_name}: {getattr(args, arg_name)}\n")
+        print(f"{arg_name}: {getattr(args, arg_name)}")
 
     return args
 
