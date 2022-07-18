@@ -76,14 +76,6 @@ if not args.keep_all_primary:
         f"  number filtered: {len(primary_dat['filtered'].keys())}\n\n"
     )
 
-    try:
-        with open('filter_primary.tsv', 'w') as fh:
-            for filtered_id, kept_id in primary_dat['filtered'].items():
-                fh.write(f"{filtered_id}\t{kept_id}\n")
-    except Exception as e:
-        sys.stderr.write(f"ERROR: writing filter_primary.tsv: {e}\n")
-        sys.exit(33)
-
 
 ################################################
 ## if no secondary_gtf:
@@ -95,16 +87,17 @@ if not args.secondary_gtf:
     primary_list = output.primary_list(primary_dat)
     sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")
 
-    sys.stderr.write(f"Writing output union.gtf:\n")
+    output_gtf = args.output_prefix + '.gtf'
+    sys.stderr.write(f"Writing output_gtf {output_gtf}:\n")
 
     try:
-        with open('union.gtf', 'w') as fh:
+        with open(output_gtf, 'w') as fh:
             for toks in primary_list:
                 toks = [str(tok) for tok in toks]
                 line = '\t'.join(toks)
                 fh.write(f"{line}\n")
     except Exception as e:
-        sys.stderr.write(f"ERROR: while writing union.gtf:\n" f"{e}\n")
+        sys.stderr.write(f"ERROR: while writing output_gtf {output_gtf}:\n" f"{e}\n")
         sys.exit(35)
 
     sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")
@@ -152,14 +145,6 @@ sys.stderr.write(
     f"  number filtered: {len(secondary_dat2['filtered'].keys())}\n\n"
 )
 
-try:
-    with open('filter_secondary.tsv', 'w') as fh:
-        for filtered_id, kept_id in secondary_dat2['filtered'].items():
-            fh.write(f"{filtered_id}\t{kept_id}\n")
-except Exception as e:
-    sys.stderr.write(f"ERROR: writing filter_secondary.tsv: {e}\n")
-    sys.exit(41)
-
 
 ################################################
 ## resolve resolved secondary against resolved primary:
@@ -180,14 +165,6 @@ sys.stderr.write(
     f"  max_loc_length: {output_dat['max_loc_length']}\n"
     f"  number filtered: {len(output_dat['filtered'].keys())}\n\n"
 )
-
-try:
-    with open('filter_xrefs.tsv', 'w') as fh:
-        for filtered_id, kept_id in output_dat['filtered'].items():
-            fh.write(f"{filtered_id}\t{kept_id}\n")
-except Exception as e:
-    sys.stderr.write(f"ERROR: writing filter_xrefs.tsv: {e}\n")
-    sys.exit(45)
 
 
 #################################################################
@@ -216,10 +193,11 @@ output_dat = output.output_list(
 )
 sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")
 
-sys.stderr.write(f"Writing outputs filter_all.tsv and union.gtf:\n")
+output_tsv = args.output_prefix + ".filter.tsv"
+sys.stderr.write(f"Writing output_tsv {output_tsv}:\n")
 
 try:
-    with open('filter_all.tsv', 'w') as fh:
+    with open(output_tsv, 'w') as fh:
         labels = [ "filtered_db", "filtered_id", "kept_db", "kept_id" ]
         line = '\t'.join(labels)
         fh.write(f"{line}\n")
@@ -228,17 +206,20 @@ try:
             line = f"{filtered_db}\t{filtered_id}\t{kept_db}\t{kept_id}\n"
             fh.write(line)
 except Exception as e:
-    sys.stderr.write(f"ERROR: writing filter.map:\n" f"{e}\n")
+    sys.stderr.write(f"ERROR: writing output_tsv {output_tsv}:\n" f"{e}\n")
     sys.exit(51)
 
+output_gtf = args.output_prefix + ".gtf"
+sys.stderr.write(f"Writing output_gtf {output_gtf}:\n")
+
 try:
-    with open('union.gtf', 'w') as fh:
+    with open(output_gtf, 'w') as fh:
         for toks in output_dat:
             toks = [str(tok) for tok in toks]
             line = '\t'.join(toks)
             fh.write(f"{line}\n")
 except Exception as e:
-    sys.stderr.write(f"ERROR: while writing union.gtf:\n" f"{e}\n")
+    sys.stderr.write(f"ERROR: while writing output_gtf {output_gtf}:\n" f"{e}\n")
     sys.exit(53)
 
 sys.stderr.write(f"  done at {round(time.time() - time_start, 2)} seconds\n\n")

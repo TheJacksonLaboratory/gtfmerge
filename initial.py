@@ -24,13 +24,15 @@ epilog = (
     "in primary_gtf, and secondary_id is the transcript_id "
     "in secondary_gtf; primary_id and/or secondary_id will be "
     "set to empty string '' if the transcript is not present "
-    "in the corresponding GTF file. Error if transcript_id in "
+    "in the corresponding GTF file. Throws error if transcript_id in "
     "primary_gtf is also found in secondary_gtf; set "
     "--primary_prefix and/or --secondary_prefix to fix this. "
     "When a transcript is found in both input files, but the "
     "exon boundaries differ (within the specified tolerances), "
     "the output exon coordinates will be taken from "
-    "primary_gtf."
+    "primary_gtf. Also outputs a tab-delimited table "
+    "cross-referencing filtered transcript_ids to the kept "
+    "transcript_id with which they were found to be redundant."
 )
 
 parser = argparse.ArgumentParser(
@@ -72,17 +74,6 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--ids_from", 
-    type=int, 
-    choices=[1, 2], 
-    default=1,
-    help=(
-        "Source of transcript_ids and gene_ids for redundant transcripts; "
-        "1: primary_gtf; 2: secondary_gtf"
-    )
-)
-
-parser.add_argument(
     "--keep_all_primary",
     action='store_true',
     help="Keep all primary transcripts (even redundant ones)"
@@ -101,6 +92,25 @@ parser.add_argument(
    default=None,
    help="Prefix to be prepended to secondary_gtf transcript_ids"
 )
+
+parser.add_argument(
+    "--output_prefix",
+    type=str,
+    default='union',
+    help="Prefix for output files"
+)
+
+parser.add_argument(
+    "--ids_from",
+    type=int,
+    choices=[1, 2],
+    default=1,
+    help=(
+        "Source of transcript_ids and gene_ids for redundant transcripts; "
+        "1: primary_gtf; 2: secondary_gtf"
+    )
+)
+
 
 def initialize():
 
@@ -130,10 +140,11 @@ def parse_args():
         'tol_sj',
         'tol_tss',
         'tol_tts',
-        'ids_from',
         'keep_all_primary',
         'primary_prefix',
-        'secondary_prefix'
+        'secondary_prefix',
+        'output_prefix',
+        'ids_from', 
     ]
 
     for arg_name in arg_names:
