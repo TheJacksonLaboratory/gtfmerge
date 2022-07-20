@@ -73,18 +73,18 @@ def match_transcripts(transcript1, transcript2, exons1, exons2, args):
         return False                       ## different number of exons
 
     if transcript1[2] == '+':
-        tol_first = getattr(args, 'tol_tss')
-        tol_last = getattr(args, 'tol_tts')
+        tol_first = args.tol_tss
+        tol_last = args.tol_tts
     elif transcript1[2] == '-':
-        tol_first = getattr(args, 'tol_tts')
-        tol_last = getattr(args, 'tol_tss')
+        tol_first = args.tol_tts
+        tol_last = args.tol_tss
     else:
         raise Exception(
             f"match_transcripts: unexpected strand '{transcript1[2]}' "
             f"for transcript {transcript1}."
         )
 
-    tol_sj = getattr(args, 'tol_sj')
+    tol_sj = args.tol_sj
 
     ## iterate over exons:
 
@@ -234,9 +234,13 @@ def filter_after(idx, loc_list, dat, args):
 
         loc_i = loc_list[i]
 
+        ## if start_i > end: no more matches:
+        if loc_i[0] > loc[1]:
+            break
+
         ## if (start_i - end) > max_loc_length:
-        if (loc_i[0] - loc[1]) > dat['max_loc_length']:
-            break                ## no more overlaps downstream
+        ## if (loc_i[0] - loc[1]) > dat['max_loc_length']:
+        ##     break                ## no more overlaps downstream
 
         transcript_id_i = loc_i[3]
         transcript_i = dat['transcripts'][transcript_id_i]
