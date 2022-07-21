@@ -1,6 +1,12 @@
+# GTFMERGE
+## Tools for merging GTF2.2 files.
+#### Contact: mitch.kostich@jax.org
+ 
 Installation:
 
 ```
+## requires Python 3; tested w/ Python 3.9.5
+
 ## dependencies:
 pip install -U argparse Cython ray
 
