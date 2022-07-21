@@ -3,6 +3,7 @@ Code for identifying overlaps between transcripts and exons.
 """
 
 import bisect
+import cython
 import ray
 
 ######################################################################################
