@@ -18,8 +18,8 @@ def exons_match(exon1, exon2, tol_start, tol_end):
     Description: compares exons of two transcripts, returns True if match else False.
 
     Inputs:
-      exon1: [ seq, strand, start, end ]
-      exon2: [ seq, strand, start, end ]
+      exon1: ( seq, strand, start, end )
+      exon2: ( seq, strand, start, end )
       tol_start: tolerance for matching exon start coordinates.
       tol_end: tolerance for matching exon end coordinates.
 

@@ -138,10 +138,10 @@ def register_exon(toks, exons, transcripts, attributes):
     exon_key = f"{toks[0]}:{toks[6]}:{toks[3]}:{toks[4]}"
 
     exons[exon_key] = (
-        toks[0],             ## 0:seq
-        toks[6],             ## 1:strand
-        toks[3],             ## 2:start
-        toks[4],             ## 3:end
+        toks[0],    ## 0:seq
+        toks[6],    ## 1:strand
+        toks[3],    ## 2:start
+        toks[4],    ## 3:end
     )
 
     if attributes['transcript_id'] not in transcripts:
