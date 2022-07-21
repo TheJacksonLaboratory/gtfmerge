@@ -16,6 +16,8 @@ params is dict w/ keys including:
   time_start: time (from time.time()) when job started
 '''
 
+import output
+
 def exons_overlap(exon_keys1, exon_keys2, exons, cutoff=0.5):
 
     n_exons1 = len(exon_keys1)
