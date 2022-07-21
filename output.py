@@ -1,5 +1,7 @@
 """
 Code for generating and printing outputs;
+
+used by gtfmerge.py
 """
 
 import copy

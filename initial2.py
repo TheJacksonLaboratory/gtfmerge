@@ -113,6 +113,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    '--memory_gb',
+    type=strictly_positive_int,
+    default=10**10,
+    help="Amount of available RAM, in gigabytes"
+)
+
+parser.add_argument(
     "--tol_sj", 
     type=non_negative_int, 
     default=0,
@@ -162,6 +169,7 @@ def parse_args():
     arg_names = [
         'gtf_list_file',
         'nthreads',
+        'memory_gb',
         'tol_sj',
         'tol_tss',
         'tol_tts',
@@ -186,14 +194,16 @@ def initialize():
         time.localtime(time_start)
     )
 
+    params = parse_args()
+    params.time_start = time_start
+    params.memory = params.memory_gb * 10**9
+
     print(
         f"time_stamp: {time_stamp}\n"
         f"hostname: {socket.gethostname()}\n"
-        f"working_directory: {os.getcwd()}"
+        f"working_directory: {os.getcwd()}\n"
+        f"memory: {params.memory}\n"
     )
-
-    params = parse_args()
-    params.time_start = time_start
 
     return params
 
