@@ -8,7 +8,7 @@ Installation:
 ## requires Python 3; tested w/ Python 3.9.5
 
 ## dependencies:
-pip install -U argparse Cython ray
+pip install -U argparse ray
 
 ## download code:
 mkdir -p ~/opt
