@@ -15,10 +15,6 @@ mkdir -p ~/opt
 cd ~/opt
 git clone https://github.com/TheJacksonLaboratory/gtfmerge.git
 
-## compile:
-cd gtfmerge
-python3 setup.py build_ext --inplace
-
 ## put $HOME/opt/gtfmerge in your path or use full path to 
 ##   gtfmerge.py and mergegtfs.py commands. 
 ```
