@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ## system:
-import multiprocessing
+import ray
 import sys
 import time
 
@@ -308,7 +308,8 @@ def read_gtf_list_file(gtf_list_file):
     return gtf_files
 
 
-def load_gtf(gtf_path, prefix, params):
+@ray.remote
+def load_gtf_ray(gtf_path, prefix, params):
 
     try:
         with open(gtf_path, 'r') as fh:
@@ -339,7 +340,7 @@ def pop_chunk(setup, chunk_size):
     return chunk
 
 
-def collapse_list(dat_list, params, pool):
+def collapse_list(dat_list, params):
 
     n = len(dat_list)
 
@@ -356,17 +357,20 @@ def collapse_list(dat_list, params, pool):
         i = idx * 2
         if idx == idx_last:
             if last_paired:
-                setup.append([dat_list[i], dat_list[i+1], params])
+                setup.append((dat_list[i], dat_list[i+1]))
             else:
                 pass
         else:
-           setup.append([dat_list[i], dat_list[i+1], params])
+           setup.append((dat_list[i], dat_list[i+1]))
 
     print(f"len(setup): {len(setup)}")
 
     ## resolve_transcripts(primary_dat, secondary_dat, params):
     if setup:
-        dat_collapse = pool.starmap(resolve.resolve_transcripts, setup)
+        futures = []
+        for dat1, dat2 in setup:
+            futures.append(resolve.resolve_transcripts_ray.remote(dat1, dat2, params))
+        dat_collapse = ray.get(futures)
     else:
         dat_collapse = []
 
@@ -376,21 +380,28 @@ def collapse_list(dat_list, params, pool):
     return dat_collapse
 
 
-def process_gtfs(params, pool):
+def process_gtfs(params):
 
     gtfs = read_gtf_list_file(params.gtf_list_file)
-    setup = [(gtf, f"{i}.", params) for (gtf, i) in zip(gtfs, range(len(gtfs)))]
-
+    setup = [(gtf, f"{i}.") for (gtf, i) in zip(gtfs, range(len(gtfs)))]
     dat = None
 
     chunk = pop_chunk(setup, params.nthreads)
     while chunk:
-        print(f"len(chunk): {len(chunk)}")
-        dat_list = pool.starmap(load_gtf, chunk)
+
+        futures = []
+        for gtf, index in chunk:
+            ## load_gtf(gtf_path, prefix, params); 
+            ##   parses and resolves self:
+            futures.append(load_gtf_ray.remote(gtf, f"{index}", params))
+
+        dat_list = ray.get(futures)
         print(f"process_gtfs: load_gtf done at {output.elapsed(params)} seconds")
         print(f"len(dat_list): {len(dat_list)}")
+
         while len(dat_list) > 1:
-            dat_list = collapse_list(dat_list, params, pool)
+            ## uses ray to parallelize calls to resolve_transcripts:
+            dat_list = collapse_list(dat_list, params)
             print(
                 f"process_gtfs: collapse_list done at "
                 f"{output.elapsed(params)} seconds"
@@ -398,6 +409,7 @@ def process_gtfs(params, pool):
             print(f"len(dat_list): {len(dat_list)}")
 
         if dat:
+            ## resolve_transcripts(primary_dat, secondary_dat, args):
             dat = resolve.resolve_transcripts(dat, dat_list[0], params)    
             print(
                 f"process_gtfs: resolve_transcripts done at "
@@ -419,8 +431,8 @@ if __name__ == '__main__':
     params = initial2.initialize()
 
     try:
-        with multiprocessing.Pool(params.nthreads) as pool:
-            dat = process_gtfs(params, pool)
+        ray.init(num_cpus=params.nthreads, object_store_memory=params.memory)
+        dat = process_gtfs(params)
     except Exception as e:
         sys.stderr.write(f"ERROR: {e}\n")
         sys.exit(31)
