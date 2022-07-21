@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# cython: embedsignature=True, binding=True
+
 '''
 dat is dict w/ keys including:
   locs: { seq: [ [start, end, strand, transcript_id], ...], ..., }
