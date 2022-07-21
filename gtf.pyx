@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# cython: embedsignature=True, binding=True 
+
 """
 parses gtf file; assumes input gtf has exon features that have 
   attributes transcript_id, and gene_id; 
