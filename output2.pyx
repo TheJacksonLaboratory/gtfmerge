@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# cython: embedsignature=True, binding=True
+
 '''
 used by mergegtfs.py
 

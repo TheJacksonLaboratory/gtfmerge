@@ -13,6 +13,7 @@ setuptools.setup(
         "assign_ids.pyx",
         "gtf.pyx", 
         "output.pyx", 
+        "output2.pyx",
         "resolve.pyx"]
     )
 )
