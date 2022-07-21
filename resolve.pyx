@@ -402,6 +402,7 @@ def filter_locs(seq, primary_dat, secondary_dat, args):
 def resolve_transcripts_ray(primary_dat, secondary_dat, args):
     return resolve_transcripts(primary_dat, secondary_dat, args)
 
+
 def resolve_transcripts(primary_dat, secondary_dat, args):
 
     """

@@ -118,7 +118,7 @@ parser.add_argument(
 parser.add_argument(
     '--memory_gb',
     type=strictly_positive_int,
-    default=10**10,
+    default=8,
     help="Amount of available RAM, in gigabytes"
 )
 
