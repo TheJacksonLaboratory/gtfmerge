@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# cython: embedsignature=True, binding=True
 
 """
 Code for generating and printing outputs;

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# cython: embedsignature=True, binding=True
 
 """
 Contains initialization and argument handling code. 
@@ -7,9 +6,68 @@ Contains initialization and argument handling code.
 
 import argparse
 import os
+import re
 import socket
 import sys
 import time
+
+def float_proportion(val):
+
+    try:
+        val = float(val)
+        if not (0 <= val <= 1):
+            raise Exception()
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            f"val '{val}' not a proportion in the interval [0, 1]"
+        )
+
+    return val
+
+
+def strictly_positive_int(val):
+
+    try:
+        val = int(val)
+        if val < 1:
+            raise Exception()
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            f"val '{val}' not a strictly positive integer"
+        )    
+
+    return val
+
+
+def non_negative_int(val):
+
+    try:
+        val = int(val)
+        if val < 0:
+            raise Exception()
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            f"val '{val}' not a non-negative integer"
+        )
+
+    return val
+
+
+def non_whitespace_str(val):
+
+    pat = re.compile(r'\s')
+
+    try:
+        val = str(val)
+        if pat.search(val):
+            raise Exception()
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            f"val '{val}' should be a string with no whitespace"
+        )
+
+    return val
+    
 
 description = (
     "Merges redundant transcripts from GTF2.2 formatted files. "
@@ -45,74 +103,88 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    "primary_gtf", 
-    help="GTF2.2 file containing primary isoform list"
+    "gtf_list_file", 
+    help="File with list of GTF2.2 files (one path per line) to be merged"
 )
 
 parser.add_argument(
-    "secondary_gtf", 
-    nargs='?', 
-    help="GTF2.2 file with secondary isoform list"
+    '--nthreads',
+    type=strictly_positive_int,
+    default=1,
+    help="Number of threads to use for parallel execution; even number more efficient"
+)
+
+parser.add_argument(
+    '--memory_gb',
+    type=strictly_positive_int,
+    default=8,
+    help="Amount of available RAM, in gigabytes"
 )
 
 parser.add_argument(
     "--tol_sj", 
-    type=int, 
+    type=non_negative_int, 
     default=0,
     help="Tolerance (bp) for matching splice junction coordinates"
 )
 
 parser.add_argument(
     "--tol_tss", 
-    type=int, 
+    type=non_negative_int, 
     default=0,
     help="Tolerance (bp) for matching transcript start coordinates"
 )
 
 parser.add_argument(
     "--tol_tts", 
-    type=int, 
+    type=non_negative_int, 
     default=0,
     help="Tolerance (bp) for matching transcript end coordinates"
 )
 
 parser.add_argument(
-    "--keep_all_primary",
-    action='store_true',
-    help="Keep all primary transcripts (even redundant ones)"
+    "--p_exon_overlap",
+    type=float_proportion,
+    default=0.5,
+    help="Minimum proportion overlap between two exons for gene matching"
 )
 
 parser.add_argument(
-    "--primary_prefix",
-    type=str,
-    default=None,
-    help="Prefix to be prepended to primary_gtf transcript_ids"
-)
-
-parser.add_argument(
-   "--secondary_prefix",
-   type=str,
-   default=None,
-   help="Prefix to be prepended to secondary_gtf transcript_ids"
+    "--p_exons_overlap",
+    type=float_proportion,
+    default=0.25,
+    help="Minimum proportion of exons with overlaps needed for gene matching"
 )
 
 parser.add_argument(
     "--output_prefix",
-    type=str,
+    type=non_whitespace_str,
     default='union',
     help="Prefix for output files"
 )
 
-parser.add_argument(
-    "--ids_from",
-    type=int,
-    choices=[1, 2],
-    default=1,
-    help=(
-        "Source of transcript_ids and gene_ids for redundant transcripts; "
-        "1: primary_gtf; 2: secondary_gtf"
-    )
-)
+
+def parse_args(): 
+
+    args = parser.parse_args()
+
+    arg_names = [
+        'gtf_list_file',
+        'nthreads',
+        'memory_gb',
+        'tol_sj',
+        'tol_tss',
+        'tol_tts',
+        'p_exon_overlap',
+        'p_exons_overlap',
+        'output_prefix',
+    ]
+
+    for arg_name in arg_names:
+        val = getattr(args, arg_name)
+        print(f"{arg_name}: {val}")
+
+    return args
 
 
 def initialize():
@@ -124,36 +196,18 @@ def initialize():
         time.localtime(time_start)
     )
 
+    params = parse_args()
+    params.time_start = time_start
+    params.memory = params.memory_gb * 10**9
+
     print(
         f"time_stamp: {time_stamp}\n"
         f"hostname: {socket.gethostname()}\n"
-        f"working_directory: {os.getcwd()}"
+        f"working_directory: {os.getcwd()}\n"
+        f"memory: {params.memory}\n"
     )
 
-    return time_start
-
-
-def parse_args(): 
-
-    args = parser.parse_args()
-
-    arg_names = [
-        'primary_gtf',
-        'secondary_gtf',
-        'tol_sj',
-        'tol_tss',
-        'tol_tts',
-        'keep_all_primary',
-        'primary_prefix',
-        'secondary_prefix',
-        'output_prefix',
-        'ids_from', 
-    ]
-
-    for arg_name in arg_names:
-        print(f"{arg_name}: {getattr(args, arg_name)}")
-
-    return args
+    return params
 
 
 if __name__ == "__main__":
