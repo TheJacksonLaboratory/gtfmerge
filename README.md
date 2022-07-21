@@ -16,8 +16,7 @@ python3 setup.py build_ext --inplace
 
 ---
 
-
-For eliminating redundancy in one GTF2.2 file or merging two GTF2.2 files:
+For eliminating redundancy in one GTF2.2 file or merging two GTF2.2 files. Produces a cross-reference of deleted isofrms to kept isoforms. One known limitation is that gene_ids are not reliable -- some transcripts that should share gene_ids are assigned different gene_ids; this should not affect sqanti filtering other than downward bias on gene expression estimates (but not transcript expression estimates) for affected transcripts:
 
 ```
 $ ./gtfmerge.py -h
@@ -61,7 +60,7 @@ filtered transcript_ids to the kept transcript_id with which they were found to 
 
 ---
 
-For merging one or more GTF2.2 files:
+For merging one or more GTF2.2 files. Can handle many files at once. Assigns new gene_ids in a sensible and tunable way. One current limitation is that cross-reference table is not produced. Will be addressed in a future update:
 
 ```
 $ ./mergegtfs.py -h
