@@ -3,17 +3,12 @@
 
 '''
 dat is dict w/ keys including:
-  locs: { seq: [ [start, end, strand, transcript_id], ...], ..., }
+  locs: { seq: [ (start, end, strand, transcript_id), ...], ..., }
   transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
-  exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+  exons: { 'seq:strand:start:end': ( seq, strand, start, end ) }
   max_loc_length: length of longest transcript
 
-params is dict w/ keys including:
-  tol_sj: tolerance for splice junction matching
-  tol_tss: tolerance for start-site matching
-  tol_tts: tolerance for termination-site matching
-  nthreads: number of threads to use
-  time_start: time (from time.time()) when job started
+params is environment used to store gene_ids attribute.
 '''
 
 import output
@@ -55,21 +50,6 @@ def match_genes(transcript1, transcript2, exons, params):
     if transcript1[2] != transcript2[2]:
         return False                       ## different strands
 
-    strand = transcript1[2]
-
-    if strand == '+':
-        tol_first = params.tol_tss
-        tol_last = params.tol_tts
-    elif strand == '-':
-        tol_first = params.tol_tts
-        tol_last = params.tol_tss
-    else:
-        raise Exception(
-            f"get_tolerances: unexpected strand '{strand}'"
-        )
-
-    tol_sj = params.tol_sj
-
     exon_keys1 = transcript1[5]
     exon_keys2 = transcript2[5]
 
@@ -83,7 +63,7 @@ def match_genes_after(idx, loc_list, dat, params, gene_ids):
     transcript = dat['transcripts'][transcript_id]
 
     if transcript_id not in gene_ids:
-        gene_ids[transcript_id] = f"PB.{params.gene_idx}"
+        gene_ids[transcript_id] = f"gene.{params.gene_idx}"
         params.gene_idx += 1
 
     for i in range(idx + 1, len(loc_list)):
@@ -131,15 +111,26 @@ def assign_transcript_ids(loc_list, gene_ids, transcript_ids):
 def resolve_ids(dat, params):
 
     """
-    ids['gene_ids']: { transcript_id1: gene_id1, transcript_id2: gene_id2, ... }
-    ids['transcript_ids']: { transcript_id1: new_transcript_id1, transcript_id2: ...}
+    Inputs:
+      dat: is dict with keys:
+        locs: { seq: [ (start, end, strand, transcript_id), ...], ..., }
+        transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
+        exons: { 'seq:strand:start:end': ( seq, strand, start, end ) }
+        max_loc_length: length of longest transcript
+
+      params: environment used to store attribute params.gene_idx, used 
+        to index successive genes.
+
+    Output: dict w/ keys:
+      'gene_ids': { transcript_id1: gene_id1, transcript_id2: gene_id2, ... }
+      'transcript_ids': { transcript_id1: new_transcript_id1, transcript_id2: ...}
     """
 
     gene_ids = {}
     transcript_ids = {}
     params.gene_idx = 1
 
-    for seq in dat['locs']:
+    for seq in sorted(dat['locs']):
 
         print(f"resolve_ids: start seq {seq} at {output.elapsed(params)} seconds")
 
