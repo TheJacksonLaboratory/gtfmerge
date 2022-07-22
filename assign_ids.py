@@ -141,16 +141,14 @@ def resolve_ids(dat, params):
 
     for seq in dat['locs']:
 
-        print(f"DEBUG: start seq: {seq} at {output.elapsed(params)} seconds")
+        print(f"resolve_ids: start seq {seq} at {output.elapsed(params)} seconds")
 
         loc_list = dat['locs'][seq]
 
         for idx in range(len(loc_list)):
             match_genes_after(idx, loc_list, dat, params, gene_ids)
-        print(f"DEBUG: match_genes_after done at {output.elapsed(params)} seconds")
 
         assign_transcript_ids(loc_list, gene_ids, transcript_ids)
-        print(f"DEBUG: assign_transcript_ids done at {output.elapsed(params)} seconds")
 
     ids = {
       'gene_ids': gene_ids,
