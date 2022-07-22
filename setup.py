@@ -4,8 +4,8 @@
 run with 'python setup.py build_ext --inplace'
 """
 
-import Cython.Build
 import setuptools
+import Cython.Build
 
 setuptools.setup(
     ext_modules=Cython.Build.cythonize([
@@ -15,7 +15,7 @@ setuptools.setup(
         'initial.pyx',
         'output2.pyx',
         'output.pyx',
-        'resolve.pyx',  
+        'resolve.pyx'
     ])
 )
 
