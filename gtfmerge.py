@@ -84,7 +84,7 @@ if not args.secondary_gtf:
     print("No secondary_gtf.")
 
     print(f"Generating final gtf output.")
-    primary_list = output.primary_list(primary_dat)
+    primary_list = output.primary_list(primary_dat, args)
     print(f"  done at {round(time.time() - time_start, 2)} seconds\n")
 
     output_gtf = args.output_prefix + '.gtf'
@@ -189,7 +189,7 @@ output_dat = output.output_list(
     output_dat,
     rmappings,
     secondary_dat['transcripts'],
-    args.ids_from
+    args
 )
 print(f"  done at {round(time.time() - time_start, 2)} seconds\n")
 

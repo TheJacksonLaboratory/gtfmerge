@@ -8,6 +8,7 @@ used by gtfmerge.py
 """
 
 import copy
+import re
 import time
 
 def elapsed(params, places=3):
@@ -137,7 +138,7 @@ def best_secondary(kept_id, rev_map, secondary_transcripts):
     return id_list[0]
 
 
-def make_attributes(output_id, output_dat, secondary_transcripts=None, rev_map=None, ids_from=1):
+def make_attributes(output_id, output_dat, args, secondary_transcripts=None, rev_map=None, ids_from=1):
 
     """
     Inputs:
@@ -149,6 +150,8 @@ def make_attributes(output_id, output_dat, secondary_transcripts=None, rev_map=N
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
         max_loc_length: length of longest transcript
         sources: { kept_id: source, ... }; where source is 1 for primary_gtf, else 2;
+
+      args: environment with attributes including primary_prefix and secondary_prefix
 
       secondary_transcripts: input data from secondary_gtf; dict:
         { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ], ... }
@@ -165,7 +168,7 @@ def make_attributes(output_id, output_dat, secondary_transcripts=None, rev_map=N
       'gene_id "gene328"; transcript_id "rna5783.2"; primary_id "rna5783.2"; secondary_id "PB.1.2";'
     """
 
-    ## [ gene_id, seq, strand, start, end, [exons] ]
+    ## [ gene_id, seq, strand, start, end, [exon_keys] ]
     output_transcript = output_dat['transcripts'][output_id]
     source = output_dat['sources'][output_id]
 
@@ -187,6 +190,12 @@ def make_attributes(output_id, output_dat, secondary_transcripts=None, rev_map=N
         gene_id = output_transcript[0]
         transcript_id = output_id
 
+    if args.primary_prefix:
+        primary_id = primary_id.lstrip(args.primary_prefix)
+
+    if args.secondary_prefix:
+        secondary_id = secondary_id.lstrip(args.secondary_prefix)
+
     output = (
         f'gene_id "{gene_id}"; '
         f'transcript_id "{transcript_id}"; '
@@ -197,7 +206,7 @@ def make_attributes(output_id, output_dat, secondary_transcripts=None, rev_map=N
     return output
 
 
-def primary_list(dat):
+def primary_list(dat, args):
 
     """
     Inputs:
@@ -208,6 +217,8 @@ def primary_list(dat):
         exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
         max_loc_length: length of longest transcript
         sources: { kept_id: source, ... }; where source is 1 for primary_gtf, else 2;
+
+      args: environment with attributes including primary_prefix and secondary_prefix.
 
     Output: list w/ format:
       [seq source feature start end score strand frame attributes]
@@ -229,7 +240,7 @@ def primary_list(dat):
             transcript = dat['transcripts'][transcript_id]
 
             ## secondary_transcripts and rev_map None; source = 1:
-            attributes = make_attributes(transcript_id, dat, None, None, 1)
+            attributes = make_attributes(transcript_id, dat, args, None, None, 1)
 
             rec = [
                 seq,                ## sequence/chromosome
@@ -267,7 +278,7 @@ def primary_list(dat):
     return output
 
 
-def output_list(dat, rev_map, secondary_transcripts, ids_from):
+def output_list(dat, rev_map, secondary_transcripts, args):
 
     """
     Inputs:
@@ -286,7 +297,8 @@ def output_list(dat, rev_map, secondary_transcripts, ids_from):
       secondary_transcripts:  
         { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
 
-      ids_from: in {1, 2}; if 1, get gene_id and transcript_id from primary_gtf, 
+      args: environment with attributes including ids_from, primary_prefix and secondary_prefix
+        ids_from: in {1, 2}; if 1, get gene_id and transcript_id from primary_gtf,
           else from secondary_gtf.
 
     Output: list:
@@ -311,9 +323,10 @@ def output_list(dat, rev_map, secondary_transcripts, ids_from):
             attributes = make_attributes(
                 transcript_id, 
                 dat, 
+                args,
                 secondary_transcripts, 
                 rev_map, 
-                ids_from
+                args.ids_from
             ) 
 
             rec = [

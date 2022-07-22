@@ -20,6 +20,7 @@ main entrypoint is parse_gtf();
     max_loc_length: length of longest encountered loc
 """
 
+import re
 
 ######################################################################
 ## inferring features:
