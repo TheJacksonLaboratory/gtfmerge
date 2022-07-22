@@ -11,6 +11,20 @@ import socket
 import sys
 import time
 
+def float_proportion(val):
+
+    try:
+        val = float(val)
+        if not (0 <= val <= 1):
+            raise Exception()
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            f"val '{val}' not a proportion in the interval [0, 1]"
+        )
+
+    return val
+
+
 description = (
     "Merges redundant transcripts from GTF2.2 formatted files. "
     "Merges primary_gtf with secondary_gtf, resulting in a non-redundant union gtf. "
@@ -83,6 +97,20 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--p_exon_overlap",
+    type=float_proportion,
+    default=0.5,
+    help="Minimum proportion overlap between two exons for gene matching"
+)
+
+parser.add_argument(
+    "--p_exons_overlap",
+    type=float_proportion,
+    default=0.25,
+    help="Minimum proportion of exons with overlaps needed for gene matching"
+)
+
+parser.add_argument(
     "--primary_prefix",
     type=str,
     default=None,
@@ -115,9 +143,37 @@ parser.add_argument(
 )
 
 
+def parse_args(): 
+
+    args = parser.parse_args()
+
+    arg_names = [
+        'primary_gtf',
+        'secondary_gtf',
+        'tol_sj',
+        'tol_tss',
+        'tol_tts',
+        'keep_all_primary',
+        'p_exon_overlap',
+        'p_exons_overlap',
+        'primary_prefix',
+        'secondary_prefix',
+        'output_prefix',
+        'ids_from', 
+    ]
+
+    for arg_name in arg_names:
+        print(f"{arg_name}: {getattr(args, arg_name)}")
+
+    return args
+
+
 def initialize():
 
     time_start = time.time()
+
+    params = parse_args()
+    params.time_start = time_start
 
     time_stamp = time.strftime(
         '%Y%m%d%H%M%S',
@@ -130,30 +186,7 @@ def initialize():
         f"working_directory: {os.getcwd()}"
     )
 
-    return time_start
-
-
-def parse_args(): 
-
-    args = parser.parse_args()
-
-    arg_names = [
-        'primary_gtf',
-        'secondary_gtf',
-        'tol_sj',
-        'tol_tss',
-        'tol_tts',
-        'keep_all_primary',
-        'primary_prefix',
-        'secondary_prefix',
-        'output_prefix',
-        'ids_from', 
-    ]
-
-    for arg_name in arg_names:
-        print(f"{arg_name}: {getattr(args, arg_name)}")
-
-    return args
+    return params
 
 
 if __name__ == "__main__":

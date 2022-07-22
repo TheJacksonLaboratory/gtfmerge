@@ -138,7 +138,7 @@ def best_secondary(kept_id, rev_map, secondary_transcripts):
     return id_list[0]
 
 
-def make_attributes(output_id, output_dat, args, secondary_transcripts=None, rev_map=None, ids_from=1):
+def make_attributes(output_id, output_dat, args, ids=None, secondary_transcripts=None, rev_map=None, ids_from=1):
 
     """
     Inputs:
@@ -152,6 +152,11 @@ def make_attributes(output_id, output_dat, args, secondary_transcripts=None, rev
         sources: { kept_id: source, ... }; where source is 1 for primary_gtf, else 2;
 
       args: environment with attributes including primary_prefix and secondary_prefix
+
+      ids: dict w/ keys:
+        'gene_ids': { transcript_id1: gene_id1, transcript_id2: gene_id2, ... }
+        'transcript_ids': { transcript_id1: new_transcript_id1, transcript_id2: ...}
+        if None, no gene remapping.
 
       secondary_transcripts: input data from secondary_gtf; dict:
         { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ], ... }
@@ -195,6 +200,9 @@ def make_attributes(output_id, output_dat, args, secondary_transcripts=None, rev
 
     if args.secondary_prefix:
         secondary_id = secondary_id.lstrip(args.secondary_prefix)
+
+    if ids:
+        gene_id = ids['gene_ids'][output_id]
 
     output = (
         f'gene_id "{gene_id}"; '
@@ -240,7 +248,7 @@ def primary_list(dat, args):
             transcript = dat['transcripts'][transcript_id]
 
             ## secondary_transcripts and rev_map None; source = 1:
-            attributes = make_attributes(transcript_id, dat, args, None, None, 1)
+            attributes = make_attributes(transcript_id, dat, args, None, None, None, 1)
 
             rec = [
                 seq,                ## sequence/chromosome
@@ -278,7 +286,7 @@ def primary_list(dat, args):
     return output
 
 
-def output_list(dat, rev_map, secondary_transcripts, args):
+def output_list(dat, rev_map, secondary_transcripts, ids, args):
 
     """
     Inputs:
@@ -296,6 +304,10 @@ def output_list(dat, rev_map, secondary_transcripts, args):
 
       secondary_transcripts:  
         { 'transcript_id': [ gene_id, seq, strand, start, end, [exons] ] }
+
+      ids: dict w/ keys:
+        'gene_ids': { transcript_id1: gene_id1, transcript_id2: gene_id2, ... }
+        'transcript_ids': { transcript_id1: new_transcript_id1, transcript_id2: ...}
 
       args: environment with attributes including ids_from, primary_prefix and secondary_prefix
         ids_from: in {1, 2}; if 1, get gene_id and transcript_id from primary_gtf,
@@ -324,9 +336,10 @@ def output_list(dat, rev_map, secondary_transcripts, args):
                 transcript_id, 
                 dat, 
                 args,
+                ids,
                 secondary_transcripts, 
                 rev_map, 
-                args.ids_from
+                args.ids_from,
             ) 
 
             rec = [
