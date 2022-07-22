@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# cython: embedsignature=True, binding=True
 
 """
 Contains initialization and argument handling code. 

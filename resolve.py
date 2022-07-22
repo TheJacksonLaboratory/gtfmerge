@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# cython: embedsignature=True, binding=True
 
 """
 Code for identifying overlaps between transcripts and exons.

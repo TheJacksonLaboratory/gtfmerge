@@ -7,13 +7,18 @@ Installation:
 ```
 ## requires Python 3; tested w/ Python 3.9.5
 
-## dependencies:
-pip install -U argparse ray
+## install python dependencies (can put in virtual environment):
+pip install -U argparse Cython ray setuptools
 
 ## download code:
 mkdir -p ~/opt
 cd ~/opt
 git clone https://github.com/TheJacksonLaboratory/gtfmerge.git
+
+## build external modules:
+cd gtfmerge
+git checkout -b cython1
+python setup.py build_ext --inplace
 
 ## put $HOME/opt/gtfmerge in your path or use full path to 
 ##   gtfmerge.py and mergegtfs.py commands. 
@@ -22,10 +27,11 @@ git clone https://github.com/TheJacksonLaboratory/gtfmerge.git
 ---
 
 For eliminating redundancy in one GTF2.2 file or merging two GTF2.2 files. 
+
 Produces a cross-reference of deleted isoforms to kept isoforms. One known 
 limitation is that gene_ids are not reliable -- some transcripts that should 
 share gene_ids are assigned different gene_ids; this should not affect sqanti 
-isoform filtering other than downward bias on gene expression estimates for
+isoform filtering other than downwardly biasing gene expression estimates for
 affected transcripts. Expression estimates of trascripts themselves should 
 remain unaffected. This program was primarily intended for merging a 
 reference gtf with a consolidated isoform gtf:
@@ -72,12 +78,12 @@ filtered transcript_ids to the kept transcript_id with which they were found to 
 
 ---
 
-For merging one or more GTF2.2 files. This program can handle several gtf 
-files at once. New gene_ids are assigned in a tunable way. One current 
-limitation is that a cross-reference table of filtered isoforms to kept 
-isoforms is not produced. This shortcoming will be addressed in a future 
-update. This program is primarily intended for consolidating isoform 
-candidate gtfs:
+
+For merging one or more GTF2.2 files. Can handle many files at once. Primarily 
+intended for merging isoform candidate lists from multiple samples. Assigns 
+new gene_ids in a sensible and tunable way. Assigns transcript_ids sequentially
+based on gene_ids. One current limitation is that cross-reference table is not 
+produced. This shortcoming will be addressed in a future update:
 
 ```
 $ ./mergegtfs.py -h
