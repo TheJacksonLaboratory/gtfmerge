@@ -6,6 +6,7 @@ import sys
 import time
 
 ## local:
+import assign_ids
 import initial2
 import gtf
 import output
@@ -89,6 +90,11 @@ def pop_chunk(setup, chunk_size):
     return chunk
 
 
+@ray.remote
+def resolve_transcripts_ray(primary_dat, secondary_dat, args):
+    return resolve.resolve_transcripts(primary_dat, secondary_dat, args)
+
+
 def collapse_list(dat_list, params):
 
     n = len(dat_list)
@@ -118,7 +124,7 @@ def collapse_list(dat_list, params):
     if setup:
         futures = []
         for dat1, dat2 in setup:
-            futures.append(resolve.resolve_transcripts_ray.remote(dat1, dat2, params))
+            futures.append(resolve_transcripts_ray.remote(dat1, dat2, params))
         dat_collapse = ray.get(futures)
     else:
         dat_collapse = []
