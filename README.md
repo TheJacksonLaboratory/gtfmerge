@@ -17,7 +17,6 @@ git clone https://github.com/TheJacksonLaboratory/gtfmerge.git
 
 ## optionally, build external modules for 25% speed gain:
 cd gtfmerge
-git checkout -b cython1
 python setup.py build_ext --inplace
 
 ## in any case, put $HOME/opt/gtfmerge in your path or use full 
