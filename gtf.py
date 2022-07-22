@@ -171,27 +171,35 @@ def parse_attributes(tok9, prefix=None):
     Output: dict w/ keys 'gene_id' and 'transcript_id'; values set to None if missing,
     """
 
-    toks = tok9.split(" ")
-    toks = [tok_i.strip().rstrip(';').strip('"')  for tok_i in toks ]
-
     if prefix is None:
         prefix = ""
 
-    if len(toks) < 4:
-        raise Exception(f"Insufficient number of attribute tokens: {toks}")
+    toks = re.split('; |;| ', tok9)
+    toks = [ tok.strip('"') for tok in toks ]
 
-    if len(toks) % 2:
-        toks.pop()
+    attributes = {}
+    idx_last = len(toks) - 1
+    idx = 0
 
-    n = int(len(toks) / 2)
-    attributes = { 'gene_id': None, 'transcript_id': None }
-
-    for i in range(n):
-        key = toks[2 * i]
-        if key == 'gene_id':
-            attributes['gene_id'] = f"{prefix}{toks[2 * i + 1]}"
-        elif key == 'transcript_id':
-            attributes['transcript_id'] = f"{prefix}{toks[2 * i + 1]}"
+    while(idx < idx_last):
+        if toks[idx] == 'transcript_id':
+            if 'transcript_id' in attributes:
+                raise Exception(f"parse_attributes: multiple transcript_ids in {tok9}")
+            elif idx == idx_last:
+                raise Exception(f"parse_attributes: no value for transcript_id in {tok9}")
+            else:
+                attributes['transcript_id'] = f"{prefix}{toks[idx + 1]}"
+                idx += 2
+        elif toks[idx] == 'gene_id':
+            if 'gene_id' in attributes:
+                raise Exception(f"parse_attributes: multiple gene_ids in {tok9}")
+            elif idx == idx_last:
+                raise Exception(f"parse_attributes: no value for gene_id in {tok9}")
+            else:
+                attributes['gene_id'] = f"{prefix}{toks[idx + 1]}"
+                idx += 2
+        else:
+            idx += 1
 
     return attributes
 
