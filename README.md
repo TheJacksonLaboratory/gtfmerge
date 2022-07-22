@@ -7,7 +7,7 @@ Installation:
 ```
 ## requires Python 3; tested w/ Python 3.9.5
 
-## install python dependencies (in a virtual environment):
+## install python dependencies (can put in virtual environment):
 pip install -U argparse Cython ray setuptools
 
 ## download code:
@@ -16,6 +16,8 @@ cd ~/opt
 git clone https://github.com/TheJacksonLaboratory/gtfmerge.git
 
 ## build external modules:
+cd gtfmerge
+git checkout -b cython1
 python setup.py build_ext --inplace
 
 ## put $HOME/opt/gtfmerge in your path or use full path to 
@@ -89,8 +91,7 @@ usage: mergegtfs.py [-h] [--nthreads NTHREADS] [--memory_gb MEMORY_GB] [--tol_sj
                     [--output_prefix OUTPUT_PREFIX]
                     gtf_list_file
 
-Merges redundant transcripts from GTF2.2 formatted files. Merges primary_gtf with secondary_gtf, resulting in a
-non-redundant union gtf. Omitting secondary_gtf results in non-redundant set from primary_gtf.
+Merges redundant transcripts from GTF2.2 formatted files, resulting in a non-redundant union gtf.
 
 positional arguments:
   gtf_list_file         File with list of GTF2.2 files (one path per line) to be merged
@@ -99,7 +100,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --nthreads NTHREADS   Number of threads to use for parallel execution; even number more efficient (default: 1)
   --memory_gb MEMORY_GB
-                        Amount of available RAM, in gigabytes (default: 10000000000)
+                        Amount of available RAM, in gigabytes (default: 8)
   --tol_sj TOL_SJ       Tolerance (bp) for matching splice junction coordinates (default: 0)
   --tol_tss TOL_TSS     Tolerance (bp) for matching transcript start coordinates (default: 0)
   --tol_tts TOL_TTS     Tolerance (bp) for matching transcript end coordinates (default: 0)
@@ -112,12 +113,7 @@ optional arguments:
 
 Input GTF2.2 formatted files are required to have exon features with attributes that include 'gene_id' and
 'transcript_id'. Output GTF2.2 formatted file includes 'exon' and 'transcript' features, both with attributes (in
-order) 'gene_id', 'transcript_id', 'primary_id', 'secondary_id; where primary_id is the transcript_id in
-primary_gtf, and secondary_id is the transcript_id in secondary_gtf; primary_id and/or secondary_id will be set to
-empty string '' if the transcript is not present in the corresponding GTF file. Throws error if transcript_id in
-primary_gtf is also found in secondary_gtf; set --primary_prefix and/or --secondary_prefix to fix this. When a
-transcript is found in both input files, but the exon boundaries differ (within the specified tolerances), the
-output exon coordinates will be taken from primary_gtf. Also outputs a tab-delimited table cross-referencing
-filtered transcript_ids to the kept transcript_id with which they were found to be redundant.
+order) 'gene_id' and 'transcript_id'. New gene_ids will be assigned in accordance with --p_exon_overlap (min
+overlap for matching exons) and --p_exons_overlap (min proportion of matched exons for matching gene_ids).
 ```
 

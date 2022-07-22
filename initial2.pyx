@@ -71,9 +71,8 @@ def non_whitespace_str(val):
     
 
 description = (
-    "Merges redundant transcripts from GTF2.2 formatted files. "
-    "Merges primary_gtf with secondary_gtf, resulting in a non-redundant union gtf. "
-    "Omitting secondary_gtf results in non-redundant set from primary_gtf."
+    "Merges redundant transcripts from GTF2.2 formatted files, "
+    "resulting in a non-redundant union gtf. "
 )
 
 epilog = (
@@ -81,20 +80,10 @@ epilog = (
     "features with attributes that include 'gene_id' and "
     "'transcript_id'. Output GTF2.2 formatted file includes "
     "'exon' and 'transcript' features, both with attributes "
-    "(in order) 'gene_id', 'transcript_id', 'primary_id', "
-    "'secondary_id; where primary_id is the transcript_id "
-    "in primary_gtf, and secondary_id is the transcript_id "
-    "in secondary_gtf; primary_id and/or secondary_id will be "
-    "set to empty string '' if the transcript is not present "
-    "in the corresponding GTF file. Throws error if transcript_id in "
-    "primary_gtf is also found in secondary_gtf; set "
-    "--primary_prefix and/or --secondary_prefix to fix this. "
-    "When a transcript is found in both input files, but the "
-    "exon boundaries differ (within the specified tolerances), "
-    "the output exon coordinates will be taken from "
-    "primary_gtf. Also outputs a tab-delimited table "
-    "cross-referencing filtered transcript_ids to the kept "
-    "transcript_id with which they were found to be redundant."
+    "(in order) 'gene_id' and 'transcript_id'. New gene_ids "
+    "will be assigned in accordance with --p_exon_overlap "
+    "(min overlap for matching exons) and --p_exons_overlap "
+    "(min proportion of matched exons for matching gene_ids)."
 )
 
 parser = argparse.ArgumentParser(
