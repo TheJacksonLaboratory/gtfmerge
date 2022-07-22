@@ -9,13 +9,13 @@ import Cython.Build
 
 setuptools.setup(
     ext_modules=Cython.Build.cythonize([
-        'assign_ids.pyx',
-        'gtf.pyx',
-        'initial2.pyx',
-        'initial.pyx',
-        'output2.pyx',
-        'output.pyx',
-        'resolve.pyx'
+        'assign_ids.py',
+        'gtf.py',
+        'initial2.py',
+        'initial.py',
+        'output2.py',
+        'output.py',
+        'resolve.py'
     ])
 )
 
