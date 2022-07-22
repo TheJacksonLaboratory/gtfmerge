@@ -27,14 +27,14 @@ python setup.py build_ext --inplace
 ---
 
 For eliminating redundancy in one GTF2.2 file or merging two GTF2.2 files. 
-Produces a cross-reference of deleted isofrms to kept isoforms. One known 
+
+Produces a cross-reference of deleted isoforms to kept isoforms. One known 
 limitation is that gene_ids are not reliable -- some transcripts that should 
 share gene_ids are assigned different gene_ids; this should not affect sqanti 
-filtering other than downward bias on gene expression estimates (but not 
-transcript expression estimates) for affected transcripts. This program was
-primarily intended for merging a reference gtf with a consolidated isoform 
-candidate gtf, with emphasis on generating a non-redundant isoform list. 
-For consolidating isoforms, use mergegtfs.py instead (see next section):
+isoform filtering other than downwardly biasing gene expression estimates for
+affected transcripts. Expression estimates of trascripts themselves should 
+remain unaffected. This program was primarily intended for merging a 
+reference gtf with a consolidated isoform gtf:
 
 ```
 $ ./gtfmerge.py -h
@@ -78,6 +78,7 @@ filtered transcript_ids to the kept transcript_id with which they were found to 
 
 ---
 
+
 For merging one or more GTF2.2 files. Can handle many files at once. Primarily 
 intended for merging isoform candidate lists from multiple samples. Assigns 
 new gene_ids in a sensible and tunable way. Assigns transcript_ids sequentially
@@ -91,7 +92,7 @@ usage: mergegtfs.py [-h] [--nthreads NTHREADS] [--memory_gb MEMORY_GB] [--tol_sj
                     [--output_prefix OUTPUT_PREFIX]
                     gtf_list_file
 
-Merges redundant transcripts from GTF2.2 formatted files, resulting in a non-redundant union gtf.
+Merges redundant transcripts from multiple GTF2.2 formatted files, resulting in a non-redundant union gtf.
 
 positional arguments:
   gtf_list_file         File with list of GTF2.2 files (one path per line) to be merged
@@ -114,6 +115,7 @@ optional arguments:
 Input GTF2.2 formatted files are required to have exon features with attributes that include 'gene_id' and
 'transcript_id'. Output GTF2.2 formatted file includes 'exon' and 'transcript' features, both with attributes (in
 order) 'gene_id' and 'transcript_id'. New gene_ids will be assigned in accordance with --p_exon_overlap (min
-overlap for matching exons) and --p_exons_overlap (min proportion of matched exons for matching gene_ids).
+overlap for matching exons) and --p_exons_overlap (min proportion of matched exons for matching gene_ids). New
+transcript_ids are assigned sequentially for each gene.
 ```
 

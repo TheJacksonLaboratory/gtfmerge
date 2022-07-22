@@ -71,19 +71,19 @@ def non_whitespace_str(val):
     
 
 description = (
-    "Merges redundant transcripts from GTF2.2 formatted files, "
-    "resulting in a non-redundant union gtf. "
+    "Merges redundant transcripts from multiple GTF2.2 formatted "
+    "files, resulting in a non-redundant union gtf."
 )
 
 epilog = (
-    "Input GTF2.2 formatted files are required to have exon "
-    "features with attributes that include 'gene_id' and "
-    "'transcript_id'. Output GTF2.2 formatted file includes "
-    "'exon' and 'transcript' features, both with attributes "
-    "(in order) 'gene_id' and 'transcript_id'. New gene_ids "
-    "will be assigned in accordance with --p_exon_overlap "
-    "(min overlap for matching exons) and --p_exons_overlap "
-    "(min proportion of matched exons for matching gene_ids)."
+    "Input GTF2.2 formatted files are required to have exon features "
+    "with attributes that include 'gene_id' and 'transcript_id'. Output "
+    "GTF2.2 formatted file includes 'exon' and 'transcript' features, both "
+    "with attributes (in order) 'gene_id' and 'transcript_id'. New gene_ids "
+    "will be assigned in accordance with --p_exon_overlap (min overlap for "
+    "matching exons) and --p_exons_overlap (min proportion of matched exons "
+    "for matching gene_ids). New transcript_ids are assigned sequentially "
+    "for each gene."
 )
 
 parser = argparse.ArgumentParser(
