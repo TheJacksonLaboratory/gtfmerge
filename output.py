@@ -1,8 +1,31 @@
+#!/usr/bin/env python
+
 """
 Code for generating and printing outputs;
+
+used by gtfmerge.py
 """
 
 import copy
+import time
+
+def elapsed(params, places=3):
+    return round(time.time() - params.time_start, places)
+
+
+def time_stamp():
+
+    """
+    returns human readable sortable timestamp str
+    """
+
+    time_stamp = time.strftime(
+        '%Y%m%d%H%M%S',
+        time.localtime(time.time())
+    )
+
+    return time_stamp
+
 
 def filter_map(primary_filter, secondary_filter, output_filter):
 
@@ -273,7 +296,7 @@ def output_list(dat, rev_map, secondary_transcripts, ids_from):
 
     output = []       ## [ [seq,src,feature,start,end,score,strand,frame,attributes], ...]
 
-    for seq in dat['locs']:
+    for seq in sorted(dat['locs']):
 
         ## [ [start, end, strand, transcript], ...]:
         locs = dat['locs'][seq]

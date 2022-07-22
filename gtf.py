@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 parses gtf file; assumes input gtf has exon features that have 
   attributes transcript_id, and gene_id; 
@@ -8,12 +10,12 @@ main entrypoint is parse_gtf();
     transcript_id.
 
   returns:
-    locs: { seq: [ [start, end, strand, transcript], ...], ..., }
+    locs: { seq: [ (start, end, strand, transcript), ...], ..., }
       locs[seq] sorted ascending by (start, end)
-    transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exon_keys] }
-      where exon_keys: 'seq:strand:start:end'), and [exon_keys] sorted 
+    transcripts: { transcript_id: [gene_id, seq, strand, start, end, [exon_keys]] }
+      where exon_keys: 'seq:strand:start:end', and [exon_keys] sorted 
       ascending by (start, end)
-    exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+    exons: { 'seq:strand:start:end': (seq, strand, start, end) }
     max_loc_length: length of longest encountered loc
 """
 
@@ -26,9 +28,9 @@ def fix_transcripts(exons, transcripts):
     """
     Inputs:
 
-      exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+      exons: { 'seq:strand:start:end': (seq, strand, start, end) }
 
-      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exon_keys] }
+      transcripts: { 'transcript_id': [gene_id, seq, strand, start, end, [exon_keys]] }
 
     Output: None
 
@@ -54,10 +56,10 @@ def infer_locs(transcripts):
 
     """
     Inputs:
-      transcripts: { 'transcript_id': [ gene_id, seq, strand, start, end, [exon_keys] }
+      transcripts: { 'transcript_id': [gene_id, seq, strand, start, end, [exon_keys]] }
 
     Outputs:
-      locs: { seq: [ [start, end, strand, transcript_id], ...], ..., }
+      locs: { seq: [ (start, end, strand, transcript_id), ...], ..., }
 
       Note: locs[seq] are sorted by (start, end)
     """
@@ -70,8 +72,8 @@ def infer_locs(transcripts):
         if seq not in locs:
             locs[seq] = []
 
-        ## [start, end, strand, transcript_id]
-        locs[seq].append([transcript[3], transcript[4], transcript[2], transcript_id])
+        ## (start, end, strand, transcript_id)
+        locs[seq].append((transcript[3], transcript[4], transcript[2], transcript_id))
 
     for seq in locs:
         locs[seq].sort(key=lambda loc: (loc[0], loc[1]))
@@ -83,7 +85,7 @@ def find_max_loc_length(locs):
 
     """
     Inputs:
-      locs: { seq: [ [start, end, strand, transcript], ...], ..., }
+      locs: { seq: [ (start, end, strand, transcript), ...], ..., }
 
     Output: length of longest loc; (1 + end - start)
     """
@@ -115,10 +117,10 @@ def register_exon(toks, exons, transcripts, attributes):
 
         expects attributes to contain transcript_id and gene_id
 
-      exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+      exons: { 'seq:strand:start:end': (seq, strand, start, end) }
         updated by this function;
 
-      transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exon_keys] }
+      transcripts: { transcript_id: [gene_id, seq, strand, start, end, [exon_keys]] }
         updated by this function;
 
       attributes: dict w/ keys 'gene_id' and 'transcript_id'; values set to None if missing
@@ -134,15 +136,15 @@ def register_exon(toks, exons, transcripts, attributes):
     ## seq:strand:start:end:
     exon_key = f"{toks[0]}:{toks[6]}:{toks[3]}:{toks[4]}"
 
-    exons[exon_key] = [
-        toks[0],             ## 0:seq
-        toks[6],             ## 1:strand
-        toks[3],             ## 2:start
-        toks[4],             ## 3:end
-    ]
+    exons[exon_key] = (
+        toks[0],    ## 0:seq
+        toks[6],    ## 1:strand
+        toks[3],    ## 2:start
+        toks[4],    ## 3:end
+    )
 
     if attributes['transcript_id'] not in transcripts:
-        transcripts[attributes['transcript_id']] = [ 
+        transcripts[attributes['transcript_id']] = [
             attributes['gene_id'],                       ## 0: gene_id
             toks[0],                                     ## 1: seq
             toks[6],                                     ## 2: strand
@@ -241,7 +243,7 @@ def parse_exons(fh, prefix):
         transcript_ids not changed if prefix is None.
 
     Outputs: exons dict:
-      { 'seq:strand:start:end': [ seq, strand, start, end ] }
+      { 'seq:strand:start:end': (seq, strand, start, end) }
     """
 
     exons = {}
@@ -276,7 +278,7 @@ def parse_exons(fh, prefix):
 
 
 ######################################################################
-## main entnscripts: { transcript_id: [ gene_id, seq, strand, start, end, [exons] }ry point:
+## main entry point:
 
 def parse_gtf(fh, prefix):
 
@@ -291,11 +293,11 @@ def parse_gtf(fh, prefix):
         transcript_ids not changed if prefix is None.
 
     Outputs: dict w/ keys:
-      locs: { seq: [ [start, end, strand, transcript], ...], ..., }
+      locs: { seq: [ (start, end, strand, transcript), ...], ..., }
         locs[seq] sorted ascending by (start, end)
-      transcripts: { transcript_id: [ gene_id, seq, strand, start, end, [exon_keys] }
-        transcripts[transcript_id][5] (exons) sorted ascending by (start, end)
-      exons: { 'seq:strand:start:end': [ seq, strand, start, end ] }
+      transcripts: { transcript_id: [gene_id, seq, strand, start, end, [exon_keys]] }
+        transcripts[transcript_id][5] (exon_keys) sorted ascending by (start, end)
+      exons: { 'seq:strand:start:end': (seq, strand, start, end) }
       max_loc_length: length of longest encountered loc 
     """
 
