@@ -15,13 +15,13 @@ mkdir -p ~/opt
 cd ~/opt
 git clone https://github.com/TheJacksonLaboratory/gtfmerge.git
 
-## build external modules:
+## optionally, build external modules for 25% speed gain:
 cd gtfmerge
 git checkout -b cython1
 python setup.py build_ext --inplace
 
-## put $HOME/opt/gtfmerge in your path or use full path to 
-##   gtfmerge.py and mergegtfs.py commands. 
+## in any case, put $HOME/opt/gtfmerge in your path or use full 
+##   path to gtfmerge.py and mergegtfs.py commands. 
 ```
 
 ---
