@@ -5,12 +5,12 @@
 Installation:
 
 ```
-## requires Python 3; tested w/ Python 3.9.5
+## requires Python 3; developed and tested w/ Python 3.9.5
 
-## install python dependencies (can put in virtual environment):
+## install python dependencies (optionally put in virtual environment):
 pip install -U argparse Cython ray setuptools
 
-## download code:
+## download code to wherever you want it:
 mkdir -p ~/opt
 cd ~/opt
 git clone https://github.com/TheJacksonLaboratory/gtfmerge.git
@@ -25,15 +25,25 @@ python setup.py build_ext --inplace
 
 ---
 
-For eliminating redundancy in one GTF2.2 file or merging two GTF2.2 files. 
+Currently we provide two programs: `gtfmerge.py` and `mergegtfs.py`. We use
+`gtfmerge.py` to merge a reference gtf with an isoform candidate gtf. We use
+`mergegtfs.py` to merge multiple isoform candidate gtfs. Neither program 
+annotates gtfs, except `gtfmerge.py` will associate transcript identifiers
+between the two input gtfs. The `mergegtfs.py` program will assign new 
+gene_ids and transcript_ids. Clustering of transcripts into genes is 
+controlled by cutoffs on the proportional overlap between exons and the 
+proportion of all exons that overlap sufficiently. 
 
-Produces a cross-reference of deleted isoforms to kept isoforms. One known 
-limitation is that gene_ids are not reliable -- some transcripts that should 
-share gene_ids are assigned different gene_ids; this should not affect sqanti 
-isoform filtering other than downwardly biasing gene expression estimates for
-affected transcripts. Expression estimates of trascripts themselves should 
-remain unaffected. This program was primarily intended for merging a 
-reference gtf with a consolidated isoform gtf:
+For eliminating redundancy in one GTF2.2 file or merging two GTF2.2 files,
+usually use `gtfmerge.py`. This produces a cross-reference of deleted isoforms 
+to kept isoforms. One known limitation is that gene_ids are not reliable -- 
+some transcripts that should share gene_ids are assigned different gene_ids; 
+this should not affect sqanti isoform filtering other than downwardly biasing 
+gene expression estimates for affected transcripts. Expression estimates of 
+trascripts themselves should remain unaffected. If this is a concern, run
+`mergegtfs.py` on the output file which will cluster transcripts into genes.
+The `gtfmerge.py` program was primarily intended for merging a reference gtf 
+with a consolidated isoform gtf:
 
 ```
 $ ./gtfmerge.py -h
@@ -77,12 +87,12 @@ filtered transcript_ids to the kept transcript_id with which they were found to 
 
 ---
 
-
-For merging one or more GTF2.2 files. Can handle many files at once. Primarily 
-intended for merging isoform candidate lists from multiple samples. Assigns 
-new gene_ids in a sensible and tunable way. Assigns transcript_ids sequentially
-based on gene_ids. One current limitation is that cross-reference table is not 
-produced. This shortcoming will be addressed in a future update:
+For merging multiple GTF2.2 files, use `mergegtfs.py`. It can handle many 
+files at once. It was developed for merging isoform candidate lists from 
+multiple samples. It assigns new gene_ids in a sensible and tunable way. Then 
+transcript_ids are assigned sequentially based on gene_ids. One current 
+limitation is that cross-reference table is not produced. This shortcoming 
+will be addressed in a future update:
 
 ```
 $ ./mergegtfs.py -h
