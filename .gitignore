@@ -1,0 +1,7 @@
+__pycache__/
+test/
+*.c
+*.so
+test*
+*.swp
+build/
