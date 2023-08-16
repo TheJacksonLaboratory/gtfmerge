@@ -10,11 +10,14 @@ import os
 import re
 import socket
 import sys
+import textwrap
 import time
 
 ## local:
 
 import intypes
+
+version = "20230816a"
 
 description = (
     "Merges redundant transcripts from GTF2.2 formatted files. "
@@ -47,100 +50,104 @@ epilog = (
 def build_parser():
 
     parser = argparse.ArgumentParser(
-	description = description,
-	epilog = epilog,
-	formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class = argparse.RawDescriptionHelpFormatter,
+        description = textwrap.dedent(f'''\
+        gtfmerge.py version {version}
+        --------------------------------
+        {description}
+        '''),
+        epilog = epilog
     )
 
     parser.add_argument(
-	"primary_gtf", 
-	help="GTF2.2 file containing primary isoform list"
+        "primary_gtf", 
+        help="GTF2.2 file containing primary isoform list"
     )
 
     parser.add_argument(
-	"secondary_gtf", 
-	nargs='?', 
-	help="GTF2.2 file with secondary isoform list"
+        "secondary_gtf", 
+        nargs='?', 
+        help="GTF2.2 file with secondary isoform list"
     )
 
     parser.add_argument(
-	"--tol_sj", 
-	type=intypes.non_negative_int, 
-	default=0,
-	help="Tolerance (bp) for matching splice junction coordinates"
+        "--tol_sj", 
+        type=intypes.non_negative_int, 
+        default=0,
+        help="Tolerance (bp) for matching splice junction coordinates"
     )
 
     parser.add_argument(
-	"--tol_tss", 
-	type=intypes.non_negative_int, 
-	default=0,
-	help="Tolerance (bp) for matching transcript start coordinates"
+        "--tol_tss", 
+        type=intypes.non_negative_int, 
+        default=0,
+        help="Tolerance (bp) for matching transcript start coordinates"
     )
 
     parser.add_argument(
-	"--tol_tts", 
-	type=intypes.non_negative_int, 
-	default=0,
-	help="Tolerance (bp) for matching transcript end coordinates"
+        "--tol_tts", 
+        type=intypes.non_negative_int, 
+        default=0,
+        help="Tolerance (bp) for matching transcript end coordinates"
     )
 
     parser.add_argument(
-	"--p_exon_overlap",
-	type=intypes.float_proportion,
-	default=0.5,
-	help="Minimum proportion overlap between two exons for gene matching"
+        "--p_exon_overlap",
+        type=intypes.float_proportion,
+        default=0.5,
+        help="Minimum proportion overlap between two exons for gene matching"
     )
 
     parser.add_argument(
-	"--p_exons_overlap",
-	type=intypes.float_proportion,
-	default=0.2,
-	help="Minimum proportion of exons with overlaps needed for gene matching"
+        "--p_exons_overlap",
+        type=intypes.float_proportion,
+        default=0.2,
+        help="Minimum proportion of exons with overlaps needed for gene matching"
     )
 
     parser.add_argument(
-	"--keep_all_primary",
-	action='store_true',
-	help="Keep all primary transcripts (even redundant ones)"
+        "--keep_all_primary",
+        action='store_true',
+        help="Keep all primary transcripts (even redundant ones)"
     )
 
     parser.add_argument(
-	"--gene_prefix",
-	type=intypes.non_whitespace_str,
-	default='LOC.',
-	help="Prefix for gene_ids and transcript_ids"
+        "--gene_prefix",
+        type=intypes.non_whitespace_str,
+        default='LOC.',
+        help="Prefix for gene_ids and transcript_ids"
     )
 
     parser.add_argument(
-	"--primary_prefix",
-	type=intypes.non_whitespace_str,
-	default=None,
-	help="Prefix to be prepended to primary_gtf transcript_ids"
+        "--primary_prefix",
+        type=intypes.non_whitespace_str,
+        default=None,
+        help="Prefix to be prepended to primary_gtf transcript_ids"
     )
 
     parser.add_argument(
-       "--secondary_prefix",
-       type=intypes.non_whitespace_str,
-       default=None,
-       help="Prefix to be prepended to secondary_gtf transcript_ids"
+        "--secondary_prefix",
+        type=intypes.non_whitespace_str,
+        default=None,
+        help="Prefix to be prepended to secondary_gtf transcript_ids"
     )
 
     parser.add_argument(
-	"--output_prefix",
-	type=intypes.non_whitespace_str,
-	default='union',
-	help="Prefix for output files"
+        "--output_prefix",
+        type=intypes.non_whitespace_str,
+        default='union',
+        help="Prefix for output files"
     )
 
     parser.add_argument(
-	"--ids_from",
-	type=int,
-	choices=[1, 2],
-	default=1,
-	help=(
-	    "Source of transcript_ids and gene_ids for redundant transcripts; "
-	    "1: primary_gtf; 2: secondary_gtf"
-	)
+        "--ids_from",
+        type=int,
+        choices=[1, 2],
+        default=1,
+        help=(
+            "Source of transcript_ids and gene_ids for redundant transcripts; "
+            "1: primary_gtf; 2: secondary_gtf"
+        )
     )
 
     return parser
@@ -186,6 +193,7 @@ def initialize():
     )
 
     print(
+        f"version: {version}\n"
         f"time_stamp: {time_stamp}\n"
         f"hostname: {socket.gethostname()}\n"
         f"working_directory: {os.getcwd()}"
